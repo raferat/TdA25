@@ -14,7 +14,7 @@ func main() {
 
   //conn, err := pgx.Connect(context.Background(), "postgres://goserver:server@127.0.0.1:5432/server")
 
-  dbpool, err := pgxpool.New(context.Background(), "postgres://goserver:server@127.0.0.1:5432/server")
+  dbpool, err := pgxpool.New(context.Background(), "postgres://goserver:server@127.0.0.1:5432/tda25")
   if err != nil {
     log.Fatalf("Unable to connect to DB: %+v\n", err)
   } else {
@@ -26,6 +26,6 @@ func main() {
   http.HandleFunc("GET /ping", func(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, "pong")
   })
-  
+
   log.Fatal(http.ListenAndServe(":3000", nil))
 }

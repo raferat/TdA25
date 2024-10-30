@@ -2,10 +2,10 @@
 set -e
 
 psql << EOF
-  DROP DATABASE server;
+  DROP DATABASE tda25;
 EOF
 
-createdb server
-psql -f initsql/createuser.sql server
-psql -f initsql/gametable.sql server
+createdb tda25
+psql -f schemas/createuser.sql tda25
+psql -f schemas/gametable.sql tda25
 
