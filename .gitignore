@@ -1,0 +1,11 @@
+# go files
+
+tdaserver
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+go.work
