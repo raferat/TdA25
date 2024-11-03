@@ -9,3 +9,4 @@ tdaserver
 *.dylib
 
 go.work
+go.work.sum
