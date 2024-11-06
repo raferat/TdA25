@@ -22,7 +22,7 @@ func loadRoutes(router *http.ServeMux, db *pgxpool.Pool) {
 
 	router.Handle("GET /api/v1/games", api.ErrorHandler(apiv1handler.ListGames))
 	router.HandleFunc("POST /api/v1/games", apiv1handler.CreateNewGame)
-	router.HandleFunc("GET /api/v1/games/{uuid}", apiv1handler.GetGameByUUID)
+	router.Handle("GET /api/v1/games/{uuid}", api.ErrorHandler(apiv1handler.GetGameByUUID))
 	router.HandleFunc("PUT /api/v1/games/{uuid}", apiv1handler.UpdateGame)
 	router.HandleFunc("DELETE /api/v1/games/{uuid}", apiv1handler.DeleteGame)
 }

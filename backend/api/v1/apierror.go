@@ -11,6 +11,7 @@ type ApiError struct {
 	Code           int    `json:"code"`
 	Reason         string `json:"message"`
 	InternalReason string `json:"-"`
+	Log            bool   `json:"-"`
 }
 
 func NewApiError(code int, msg string, internal string) *ApiError {
@@ -18,6 +19,14 @@ func NewApiError(code int, msg string, internal string) *ApiError {
 		Code:           code,
 		Reason:         msg,
 		InternalReason: internal,
+		Log:            true,
+	}
+}
+
+func NewApiErrorResponse(code int, msg string) *ApiError {
+	return &ApiError{
+		Code:   code,
+		Reason: msg,
 	}
 }
 
@@ -27,9 +36,13 @@ func ErrorHandler(errApi ErrorApiFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := errApi(w, r)
 		if err != nil {
-			w.Header().Add("Content-Type", "text/json")
+      if err.Reason == "" {
+    		err.Reason = http.StatusText(err.Code)
+    	}
+
 			w.WriteHeader(err.Code)
 			json.NewEncoder(w).Encode(err)
+
 
 			logError(err)
 		}
@@ -37,5 +50,7 @@ func ErrorHandler(errApi ErrorApiFunc) http.Handler {
 }
 
 func logError(err *ApiError) {
-	color.HiRed("ERROR:\tCode:\t\t%03d\n\tReason:\t\t%s\n\tInternal:\t%s\n", err.Code, err.Reason, err.InternalReason)
+	if err.Log {
+		color.HiRed("ERROR:\tCode:\t\t%03d\n\tReason:\t\t%s\n\tInternal:\t%s\n", err.Code, err.Reason, err.InternalReason)
+	}
 }
