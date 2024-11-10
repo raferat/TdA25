@@ -19,9 +19,9 @@ go build tdaserver
 ```
 ### Spuštění
 ```bash
-./tdaserver
+PORT=:4242 ./tdaserver
 ```
-
+Server běží na adrese [127.0.0.1:4242](http://127.0.0.1:4242)
 ## Docker
 ### Sestavení
 ```bash
