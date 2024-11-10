@@ -45,7 +45,7 @@ func initDBConnection() *pgxpool.Pool {
 func main() {
 	// gracefull shutdown setup
 	termsignals := make(chan os.Signal, 1)
-	done := make(chan bool, 1)
+	done := make(chan bool, 2)
 	signal.Notify(termsignals, syscall.SIGINT, syscall.SIGTERM)
 
 	// database connection
@@ -67,7 +67,10 @@ func main() {
 		done <- true
 	}()
 
-	// start server and wait till shutdown
-	log.Fatal(server.ListenAndServe())
+  err := server.ListenAndServe()
+	if err != nil {
+  	log.Println(err)
+    done <- true
+  }
 	<-done
 }

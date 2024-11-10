@@ -8,3 +8,4 @@ BASEDIR=$(dirname "$0")
 
 cd $BASEDIR && ./tdaserver
 
+
