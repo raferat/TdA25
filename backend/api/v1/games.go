@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+  "log"
 	"net/http"
 	"time"
+
+  "tdaserver/utils/gameutils"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type gameinfo struct {
+/*type gameinfo struct {
 	Id         string     `json:"uuid"`
 	Name       string     `json:"name"`
 	Difficulty string     `json:"difficulty"`
@@ -18,13 +21,23 @@ type gameinfo struct {
 	Board      [][]string `json:"board"`
 	Created    time.Time  `json:"createdAt"`
 	Updated    time.Time  `json:"updatedAt"`
-}
+}*/
+
 
 type dbscanner interface {
 	Scan(dest ...any) error
 }
 
-func scanGameRow[T dbscanner](row T) (*gameinfo, error) {
+func convertPostgresTo2DArray[T any](pg pgtype.Array[T]) [][]T {
+  board_arr := make([][]T, 0, pg.Dimensions()[0].Length)
+	for i := int32(0); i < pg.Dimensions()[0].Length*pg.Dimensions()[1].Length; i += pg.Dimensions()[1].Length {
+		board_arr = append(board_arr, pg.Elements[i:i+pg.Dimensions()[1].Length])
+	}
+
+  return board_arr
+}
+
+func scanGameRow[T dbscanner](row T) (*gameutils.GameInfo, error) {
 	var (
 		id         string
 		name       string
@@ -40,20 +53,48 @@ func scanGameRow[T dbscanner](row T) (*gameinfo, error) {
 		return nil, err
 	}
 
-	board_arr := make([][]string, 0, board.Dimensions()[0].Length)
+	/*board_arr := make([][]string, 0, board.Dimensions()[0].Length)
 	for i := int32(0); i < board.Dimensions()[0].Length*board.Dimensions()[1].Length; i += board.Dimensions()[1].Length {
 		board_arr = append(board_arr, board.Elements[i:i+board.Dimensions()[1].Length])
-	}
+	}*/
 
-	return &gameinfo{
+  board_arr := convertPostgresTo2DArray(board)
+
+	return &gameutils.GameInfo{
+    MandatoryGameInfo: gameutils.MandatoryGameInfo{
+      Name: name,
+		  Difficulty: difficulty,
+		  Board:      board_arr,
+    },
 		Id:         id,
-		Name:       name,
-		Difficulty: difficulty,
 		State:      state,
-		Board:      board_arr,
 		Created:    created,
 		Updated:    updated,
 	}, nil
+}
+
+func convert2DArrayToPostgres[T any](board [][]T) pgtype.Array[T] {
+  board_array := pgtype.Array[T]{}
+  board_array.SetDimensions([]pgtype.ArrayDimension{
+    {Length: 15, LowerBound: 1},
+    {Length: 15, LowerBound: 1},
+  })
+
+  for i := 0; i < len(board); i++ {
+    width := len(board[i])
+    for j := 0; j < width; j++ {
+      ptr, ok := board_array.ScanIndex(i*width + j).(*T)
+      if ok {
+        *ptr = board[i][j]
+      }
+    }
+  }
+  
+  for _, v := range board {
+    board_array.Elements = append(board_array.Elements, v...)
+  }
+
+  return board_array
 }
 
 func (h *Handler) ListGames(w http.ResponseWriter, r *http.Request) *ApiError {
@@ -99,7 +140,35 @@ func (h *Handler) ListGames(w http.ResponseWriter, r *http.Request) *ApiError {
 }
 
 func (h *Handler) CreateNewGame(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Create")
+  mgi := &gameutils.MandatoryGameInfo{
+    Name: "Test from GO",
+    Difficulty: "beginner",
+    Board: [][]string {
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+      {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
+    },
+  }
+
+
+
+  _, err := h.DB.Exec(r.Context(), "INSERT INTO games (name, game_difficulty, game_state, board) VALUES ($1, $2, $3, $4) ON CONFLICT (name) DO NOTHING",
+    mgi.Name, mgi.Difficulty, "unknown", convert2DArrayToPostgres(mgi.Board),
+  )
+
+  log.Println(err)
 }
 
 func (h *Handler) GetGameByUUID(w http.ResponseWriter, r *http.Request) *ApiError {
@@ -132,6 +201,16 @@ func (h *Handler) UpdateGame(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "update"+r.PathValue("uuid"))
 }
 
-func (h *Handler) DeleteGame(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "delete"+r.PathValue("uuid"))
+func (h *Handler) DeleteGame(w http.ResponseWriter, r *http.Request) *ApiError {
+  tag, err := h.DB.Exec(r.Context(), "DELETE FROM games WHERE game_id = $1", r.PathValue("uuid"))
+  if err != nil {
+    return NewApiError(http.StatusInternalServerError, "", err.Error())
+  }
+
+  if tag.RowsAffected() == 0 {
+    return NewApiErrorResponse(http.StatusNotFound, "Resource not found")
+  }
+
+  w.WriteHeader(http.StatusNoContent)
+  return nil
 }
