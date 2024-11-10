@@ -21,11 +21,11 @@ func loadRoutes(router *http.ServeMux, db *pgxpool.Pool) {
 	}
 
 	router.Handle("GET /api/v1/games", api.ErrorHandler(apiv1handler.ListGames))
-	router.HandleFunc("POST /api/v1/games", apiv1handler.CreateNewGame)
+	router.Handle("POST /api/v1/games", api.ErrorHandler(apiv1handler.CreateNewGame))
 	router.Handle("GET /api/v1/games/{uuid}", api.ErrorHandler(apiv1handler.GetGameByUUID))
 	router.HandleFunc("PUT /api/v1/games/{uuid}", apiv1handler.UpdateGame)
 	router.Handle("DELETE /api/v1/games/{uuid}", api.ErrorHandler(apiv1handler.DeleteGame))
-  /*router.HandleFunc("GET /", func (w http.ResponseWriter, r *http.Request) {
+  router.HandleFunc("GET /", func (w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, "../TDA-mockupy/mockfish2025.html")
-  })*/
+  })
 }

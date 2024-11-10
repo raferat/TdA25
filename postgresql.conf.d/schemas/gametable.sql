@@ -4,7 +4,7 @@ CREATE TYPE board_tile AS ENUM ('X', 'O', '');
 
 CREATE TABLE games (
   game_id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  name text UNIQUE NOT NULL,
+  name text NOT NULL,
 
   game_difficulty difficulty NOT NULL,
   game_state state NOT NULL,

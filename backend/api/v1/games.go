@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-  "log"
 	"net/http"
 	"time"
 
@@ -12,17 +11,6 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
-
-/*type gameinfo struct {
-	Id         string     `json:"uuid"`
-	Name       string     `json:"name"`
-	Difficulty string     `json:"difficulty"`
-	State      string     `json:"gameState"`
-	Board      [][]string `json:"board"`
-	Created    time.Time  `json:"createdAt"`
-	Updated    time.Time  `json:"updatedAt"`
-}*/
-
 
 type dbscanner interface {
 	Scan(dest ...any) error
@@ -52,11 +40,6 @@ func scanGameRow[T dbscanner](row T) (*gameutils.GameInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	/*board_arr := make([][]string, 0, board.Dimensions()[0].Length)
-	for i := int32(0); i < board.Dimensions()[0].Length*board.Dimensions()[1].Length; i += board.Dimensions()[1].Length {
-		board_arr = append(board_arr, board.Elements[i:i+board.Dimensions()[1].Length])
-	}*/
 
   board_arr := convertPostgresTo2DArray(board)
 
@@ -139,8 +122,11 @@ func (h *Handler) ListGames(w http.ResponseWriter, r *http.Request) *ApiError {
 	return nil
 }
 
-func (h *Handler) CreateNewGame(w http.ResponseWriter, r *http.Request) {
-  mgi := &gameutils.MandatoryGameInfo{
+func (h *Handler) CreateNewGame(w http.ResponseWriter, r *http.Request) *ApiError {
+  mgi := &gameutils.MandatoryGameInfo{}
+  json.NewDecoder(r.Body).Decode(mgi)
+
+  /*mgi := &gameutils.MandatoryGameInfo{
     Name: "Test from GO",
     Difficulty: "beginner",
     Board: [][]string {
@@ -160,15 +146,21 @@ func (h *Handler) CreateNewGame(w http.ResponseWriter, r *http.Request) {
       {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
       {"", "X", "O", "X", "O", "X", "O", "", "", "X", "O", "X", "", "O", "X"},
     },
+  }*/
+
+  ok, field := mgi.HasEmptyField()
+  if !ok {
+    return NewApiErrorResponse(http.StatusBadRequest, fmt.Sprintf("Bad request: field `%s` is required", field))
   }
-
-
-
-  _, err := h.DB.Exec(r.Context(), "INSERT INTO games (name, game_difficulty, game_state, board) VALUES ($1, $2, $3, $4) ON CONFLICT (name) DO NOTHING",
+  _, err := h.DB.Exec(r.Context(), "INSERT INTO games (name, game_difficulty, game_state, board) VALUES ($1, $2, $3, $4)",
     mgi.Name, mgi.Difficulty, "unknown", convert2DArrayToPostgres(mgi.Board),
   )
 
-  log.Println(err)
+  if err != nil {
+    return NewApiError(http.StatusInternalServerError, "", "Error creating new game: " + err.Error())
+  }
+
+  return nil
 }
 
 func (h *Handler) GetGameByUUID(w http.ResponseWriter, r *http.Request) *ApiError {
