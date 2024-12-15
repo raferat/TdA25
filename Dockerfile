@@ -2,7 +2,7 @@ FROM golang:1.23.2-alpine3.20 AS build-backend
 
 WORKDIR /app
 COPY ./backend .
-RUN ["apk", "add", "build-base"]
+RUN ["apk", "add", "gcc", "musl-dev", "binutils"]
 RUN ["go", "build", "-o", "/app/tdaserver"]
 
 FROM alpine AS run-stage
