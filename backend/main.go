@@ -18,14 +18,20 @@ func main() {
     w.Header().Add("Content-Type", "text/html")
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, `
-    <html>
-      <head>
-        <meta http-equiv="Refresh" content="0; URL=https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
-      </head>
-      <body>
-        Hello TdA
-      </body>
-    </html>`)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML5 Boilerplate</title>
+</head>
+
+<body>
+  <h1>Page Title</h1>
+  <p>Hello TdA</p>
+</body>
+
+</html>`)
   })
 
   server.HandleFunc("GET /api", func(w http.ResponseWriter, r *http.Request) {
