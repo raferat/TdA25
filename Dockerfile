@@ -9,7 +9,7 @@ FROM alpine AS run-stage
 WORKDIR /app
 COPY --from=build-stage /app/tdaserver .
 RUN ["chmod", "+x", "tdaserver"]
-ENV PORT=":80"
-EXPOSE 80
+ENV PORT=":4242"
+EXPOSE 4242
 
 ENTRYPOINT ["/app/tdaserver"]
