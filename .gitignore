@@ -2,6 +2,8 @@
 
 tdaserver
 
+*.db
+
 *.exe
 *.exe~
 *.dll

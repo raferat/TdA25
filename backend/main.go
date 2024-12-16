@@ -1,47 +1,54 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+
+	"tdaserver/pkg/db"
 )
 
+func gracefulShutdown(server *http.Server) context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+	signalChan := make(chan os.Signal, 5)
+	signal.Notify(signalChan, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGSEGV, syscall.SIGTERM)
+
+	go func() {
+		sig := <-signalChan
+		log.Printf("Graceful shutdown: %s\n", sig.String())
+		server.Shutdown(ctx)
+		cancel()
+	}()
+
+	return ctx
+}
+
+func initServer() *http.Server {
+	handler := http.NewServeMux()
+	portStr := ":4242"
+	if val, ok := os.LookupEnv("PORT"); ok {
+		portStr = val
+	}
+
+	router(handler)
+
+	return &http.Server{
+		Addr:    portStr,
+		Handler: handler,
+	}
+}
+
 func main() {
-  server := http.NewServeMux()
-  portStr := ":4242"
-  if len(os.Args) == 2 {
-    portStr = os.Args[1]
-  }
+	server := initServer()
+	ctx := gracefulShutdown(server)
+	_, end := db.InitDB(ctx)
 
-  server.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-    w.Header().Add("Content-Type", "text/html")
-    w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HTML5 Boilerplate</title>
-</head>
-
-<body>
-  <h1>Page Title</h1>
-  <p>Hello TdA</p>
-</body>
-
-</html>`)
-  })
-
-  server.HandleFunc("GET /api", func(w http.ResponseWriter, r *http.Request) {
-    w.Header().Add("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, `{"organization": "Student Cyber Games"}`)
-  })
-
-
-  if err := http.ListenAndServe(portStr, server); err != nil {
-    log.Fatalln(err)
-  }
+	log.Printf("Server running on: %s\n", server.Addr)
+	if err := server.ListenAndServe(); err != nil {
+		log.Println(err)
+	}
+	<-end.Done()
 }
