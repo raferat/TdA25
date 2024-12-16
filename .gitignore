@@ -3,12 +3,16 @@
 tdaserver
 
 *.db
+*.db-wal
+*.db-shm
 
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+
+
 
 go.work
 go.work.sum

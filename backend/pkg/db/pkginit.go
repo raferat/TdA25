@@ -45,13 +45,13 @@ func InitDB(ctx context.Context) (*sql.DB, context.Context) {
 	}
 
 	if len(initsql) != 0 {
-		res, err := db.ExecContext(ctx, initsql)
+		_, err := db.ExecContext(ctx, initsql)
 		if err != nil {
 			log.Printf("Error in DB init function: %#v\n", err)
 			return nil, context.Background()
-		} else {
-			log.Printf("DB Init completed: %#v\n", res)
 		}
+
+		log.Printf("DB Init completed\n")
 	}
 
 	err = prepareQueries(db)

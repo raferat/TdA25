@@ -16,24 +16,28 @@ func gracefulShutdown(server *http.Server) context.Context {
 	signalChan := make(chan os.Signal, 5)
 	signal.Notify(signalChan, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGSEGV, syscall.SIGTERM)
 
+	end := func() {
+		server.Shutdown(ctx)
+		cancel()
+	}
+
 	go func() {
 		sig := <-signalChan
 		log.Printf("Graceful shutdown: %s\n", sig.String())
-		server.Shutdown(ctx)
-		cancel()
+		end()
 	}()
 
 	return ctx
 }
 
 func initServer() *http.Server {
-	handler := http.NewServeMux()
+	mux := http.NewServeMux()
 	portStr := ":4242"
 	if val, ok := os.LookupEnv("PORT"); ok {
 		portStr = val
 	}
 
-	router(handler)
+	handler := router(mux)
 
 	return &http.Server{
 		Addr:    portStr,
@@ -50,5 +54,6 @@ func main() {
 	if err := server.ListenAndServe(); err != nil {
 		log.Println(err)
 	}
+
 	<-end.Done()
 }
