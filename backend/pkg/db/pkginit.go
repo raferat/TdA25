@@ -19,9 +19,9 @@ var (
 	getGames *sql.Stmt
 
 	// SELECT * FROM games WHERE uuid=?
-	getGameByUUID *sql.Stmt
+	findGame *sql.Stmt
 
-	// UPDATE games SET name=?, difficulty=?, board=?, updated_at=? WHERE uuid=?
+	// UPDATE games SET updated_at=?, name=?, difficulty=?, game_state=?, board=? WHERE uuid=? RETURNING created_at
 	editGame *sql.Stmt
 
 	// DELETE FROM games WHERE uuid=?
@@ -32,11 +32,13 @@ var (
 var initsql string
 
 func InitDB(ctx context.Context) (*sql.DB, context.Context) {
-	db, err := sql.Open("sqlite3", "file:data.db?cache=shared&mode=rwc&_journal_mode=WAL")
+	db, err := sql.Open("sqlite3", "file:data.db?cache=shared&mode=rwc&_journal_mode=WAL&_busy_timeout=50")
 	if err != nil {
 		log.Printf("Error DB open: %#v\n", err)
 		return nil, context.Background()
 	}
+
+	db.SetMaxOpenConns(1)
 
 	err = db.PingContext(ctx)
 	if err != nil {
@@ -87,12 +89,12 @@ func prepareQueries(db *sql.DB) (err error) {
 		return err
 	}
 
-	getGameByUUID, err = db.Prepare("SELECT * FROM games WHERE uuid=?")
+	findGame, err = db.Prepare("SELECT * FROM games WHERE uuid=?")
 	if err != nil {
 		return err
 	}
 
-	editGame, err = db.Prepare("UPDATE games SET name=?, difficulty=?, board=?, updated_at=? WHERE uuid=?")
+	editGame, err = db.Prepare("UPDATE games SET updated_at=?, name=?, difficulty=?, game_state=?, board=? WHERE uuid=? RETURNING created_at")
 	if err != nil {
 		return err
 	}
@@ -111,7 +113,7 @@ func closeQueries() {
 	utils.LogIfErrNotNil("Closing createGame query", err)
 	err = getGames.Close()
 	utils.LogIfErrNotNil("Closing getGames query", err)
-	err = getGameByUUID.Close()
+	err = findGame.Close()
 	utils.LogIfErrNotNil("Closing getGameByUUID query", err)
 	err = editGame.Close()
 	utils.LogIfErrNotNil("Closing editGame query", err)

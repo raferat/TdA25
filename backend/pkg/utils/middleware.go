@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -82,12 +83,6 @@ func (w *fakeWriter) Header() http.Header {
 	return w.writer.Header()
 }
 
-type writerWithoutWriteHeader struct {
-	http.ResponseWriter
-}
-
-func (w *writerWithoutWriteHeader) WriteHeader(a int) {}
-
 func NotFoundMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		wrapped := &fakeWriter{
@@ -103,6 +98,22 @@ func NotFoundMiddleware(next http.Handler) http.Handler {
 
 		w.Header().Add("Location", "/404.html")
 		w.WriteHeader(http.StatusMovedPermanently)
-		// http.ServeFile(&writerWithoutWriteHeader{w}, r, "./static/404.html")
+	})
+}
+
+//======================================================= JSON Encode =======================================================
+
+type JSONReturnFunction func(r *http.Request) (code int, object any)
+
+func JSONEncodeMiddleware(next JSONReturnFunction) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		code, obj := next(r)
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(code)
+		if obj != nil {
+			enc := json.NewEncoder(w)
+			enc.Encode(obj)
+		}
 	})
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"tdaserver/pkg/api"
 	"tdaserver/pkg/utils"
 )
 
@@ -12,30 +13,16 @@ func router(mux *http.ServeMux) http.Handler {
 
 	mux.Handle("GET /", utils.NotFoundMiddleware(http.FileServer(http.Dir("./static"))))
 
+	mux.Handle("POST /api/v1/games", utils.JSONEncodeMiddleware(api.CreateGame))
+	mux.Handle("GET /api/v1/games", utils.JSONEncodeMiddleware(api.ListGames))
+	mux.Handle("GET /api/v1/games/{uuid}", utils.JSONEncodeMiddleware(api.FindGame))
+	mux.Handle("PUT /api/v1/games/{uuid}", utils.JSONEncodeMiddleware(api.UpdateGame))
+	mux.Handle("DELETE /api/v1/games/{uuid}", utils.JSONEncodeMiddleware(api.DeleteGame))
+
 	return utils.LoggingMiddleware(mux)
 }
 
 func HowDoesItWork(mux *http.ServeMux) {
-	/*mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Add("Content-Type", "text/html")
-			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, `
-	<!DOCTYPE html>
-	<html lang="en">
-	<head>
-	  <meta charset="utf-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-	  <title>HTML5 Boilerplate</title>
-	</head>
-
-	<body>
-	  <h1>Page Title</h1>
-	  <p>Hello TdA</p>
-	</body>
-
-	</html>`)
-		})*/
-
 	mux.HandleFunc("GET /api", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
