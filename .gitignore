@@ -12,7 +12,7 @@ tdaserver
 *.so
 *.dylib
 
-
+website
 
 go.work
 go.work.sum
