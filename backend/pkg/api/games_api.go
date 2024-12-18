@@ -1,26 +1,13 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"tdaserver/pkg/db"
-	"tdaserver/pkg/utils"
 )
 
-func CreateGame(r *http.Request) (int, any) {
-	dec := json.NewDecoder(r.Body)
-	var base db.GameBase
-	err := dec.Decode(&base)
-	if err != nil {
-		return http.StatusBadRequest, NewBadRequestError(err.Error())
-	}
-
-	if ok, msg := utils.CheckIntegrity(base.Board); !ok {
-		return http.StatusUnprocessableEntity, NewUnprocessableEntityError(msg)
-	}
-
-	game := db.CreateGame(&base)
+func CreateGame(base *db.GameBase, r *http.Request) (int, any) {
+	game := db.CreateGame(base)
 	if game == nil {
 		return http.StatusInternalServerError, NewInternalServerError()
 	}
@@ -45,21 +32,10 @@ func FindGame(r *http.Request) (int, any) {
 	return http.StatusOK, game
 }
 
-func UpdateGame(r *http.Request) (int, any) {
+func UpdateGame(base *db.GameBase, r *http.Request) (int, any) {
 	uuid := r.PathValue("uuid")
-	dec := json.NewDecoder(r.Body)
 
-	var base db.GameBase
-	err := dec.Decode(&base)
-	if err != nil {
-		return http.StatusBadRequest, NewBadRequestError(err.Error())
-	}
-
-	if ok, msg := utils.CheckIntegrity(base.Board); !ok {
-		return http.StatusUnprocessableEntity, NewUnprocessableEntityError(msg)
-	}
-
-	game := db.UpdateGame(uuid, &base)
+	game := db.UpdateGame(uuid, base)
 
 	if game == nil {
 		return http.StatusNotFound, NewNotFoundError()
