@@ -1,5 +1,10 @@
 # TdA25 tým `ještě nevíme`
 
+## Technologie
+- backend: Go - standartní net/http
+- frontend: SvelteKit - statický adapter a fallback
+- databáze: SQLite - driver mattn/go-sqlite3
+
 ## Požadavky
 - [Go](https://go.dev) (min. 1.22)
 - [Docker](https://docker.com) (na odeslání)
@@ -7,7 +12,7 @@
 ## Setup lokálního dev prostředí
 ```bash
 git clone https://github.com/raferat/TdA25.git
-cd TdA25 
+cd TdA25
 go work init && go work use ./backend
 go run tdaserver
 ```

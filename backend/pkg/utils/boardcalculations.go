@@ -4,6 +4,25 @@ func CalculateGameState([][]string) string {
 	return "unknown"
 }
 
+// returns true when Difficulty is OK
+func CheckDifficulty(str string) bool {
+	states := []string{
+		"beginner",
+		"easy",
+		"medium",
+		"hard",
+		"extreme",
+	}
+
+	for _, v := range states {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
+
 // reutrns true, if the board is OK, string is error message
 func CheckIntegrity(board [][]string) (bool, string) {
 	if !checkSize(board) {
