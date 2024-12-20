@@ -1,10 +1,13 @@
 <script lang="ts">
     import { listGames } from "$lib/api";
+    import Board from "$lib/Board.svelte";
 
     let x = listGames();
 </script>
 
 <h1>Game</h1>
+
+<Board/>
 
 {#await x}
     <p>Loading</p>

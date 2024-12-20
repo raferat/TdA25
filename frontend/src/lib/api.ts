@@ -1,4 +1,4 @@
-interface Game {
+export interface Game {
     uuid: string,
     createdAt: string,
     updatedAt: string,
@@ -8,10 +8,18 @@ interface Game {
     board: string[][],
 }
 
-interface GameBase {
+export interface GameBase {
     name: string,
     difficulty: string,
     board: string[][],
+}
+
+export function defaultGameBase(): GameBase {
+    return {
+        name: "Untitled",
+        difficulty: "beginner",
+        board: Array.from({length: 15}, () => Array(15).fill('')),
+    };
 }
 
 export async function listGames(): Promise<Game[]> {
