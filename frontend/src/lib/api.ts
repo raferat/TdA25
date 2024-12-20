@@ -36,9 +36,28 @@ export async function findGame(uuid: string): Promise<Game> {
     return json
 }
 
+export async function deleteGame(uuid: string): Promise<void> {
+    await fetch(`/api/v1/games/${uuid}`, {
+        method: 'DELETE'
+    });
+}
+
 export async function createGame(base: GameBase): Promise<Game> {
     const result = await fetch('/api/v1/games', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(base),
+    })
+
+    return await result.json();
+}
+
+export async function updateGame(base: GameBase, uuid: string): Promise<Game> {
+    const result = await fetch(`/api/v1/games/${uuid}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
