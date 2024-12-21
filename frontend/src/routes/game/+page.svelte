@@ -2,13 +2,22 @@
     import { listGames } from "$lib/api";
     import Board from "$lib/Board.svelte";
 
-    let x = listGames();
 </script>
 
-<h1>Game</h1>
+<main>
+    <Board/>
+</main>
 
-<Board/>
+<style lang="scss">
+    main {
+        padding: 15px;
+        max-width: 100%;
+        max-height: calc(100% - 130px);
+        aspect-ratio: 1;
+    }
+</style>
 
+<!--
 {#await x}
     <p>Loading</p>
 {:then val}
@@ -23,3 +32,4 @@
         <hr>
     {/each}
 {/await}
+-->
