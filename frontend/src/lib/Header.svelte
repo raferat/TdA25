@@ -14,7 +14,7 @@
                 <h3>Hrát</h3>
             </Button>
 
-            <Button variant="blue" href="/gamelist/">
+            <Button variant="blue" href="/game/">
                 <h3>Seznam úloh</h3>
             </Button>
         </div>
