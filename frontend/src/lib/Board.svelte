@@ -3,7 +3,6 @@
     import { expoOut, sineOut } from "svelte/easing";
     import { fade, fly } from "svelte/transition";
     import { isWinMove } from "./boardutil";
-    import { onMount } from "svelte";
     
 
     let { 
@@ -28,8 +27,10 @@
     }
 
     $effect(() => {
+        
         if ( value != undefined )
             isPlaying = true;
+        nextSymbol = "X";
     });
 </script>
 
