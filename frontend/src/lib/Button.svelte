@@ -36,27 +36,39 @@
 {/if}
 
 <style lang="scss">
+    @use 'sass:color';
+
     a, button, div {
         display: block;
         border: none;
         background: none;
+        min-width: 238px;
+        min-height: 76px;
         padding: 20px 60px;
         margin: 0;
 
 
         color: #F6F6F6;
-        //border: 2px solid #F6F6F6;
         text-decoration: none;
         cursor: pointer;
         border-radius: 10px;
-        font-size: large;
+        font-size: 24pt;
+        transition: all 150ms cubic-bezier(0.445, 0.05, 0.55, 0.95);
     }
 
     .red {
         background-color: #E31837;
+
+        &:hover {
+            background-color: color.adjust(#E31837, $lightness: -5%, $space: hsl);
+        }
     }
 
     .blue {
         background-color: #0070BB;
+
+        &:hover {
+            background-color: color.adjust(#0070BB, $lightness: -5%, $space: hsl);
+        }
     }
 </style>

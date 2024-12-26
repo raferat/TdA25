@@ -1,28 +1,32 @@
 <script>
     import Button from "./Button.svelte";
-
 </script>
+
 <header>
     <nav>
-        <a href="/" aria-label="úvod">
-            <div class="logo"></div>
-        </a>
-        
-        
-        <div class="links">
-            <Button href="/game/">
-                <h3>Hrát</h3>
-            </Button>
-
-            <Button variant="blue" href="/game/">
-                <h3>Seznam úloh</h3>
-            </Button>
-        </div>
+        <a href="/">Úvod</a>
+        <a href="/game/">Hrát</a>
+        <a href="/game/">Seznam úloh</a>
     </nav>
 </header>
 
 <style lang="scss">
+    .mainlink {
+        display: flex;
+        border: 2px solid #1A1A1A;
+        border-radius: 10px;
+        padding: 20px 50px;
+        h1 {
+            text-align: center;
+            font-size: 40pt;
+            line-height: 0;
+            margin: auto;
+            margin-left: 0;
+        }
+    }
+
     header {
+        height: 130px;
         padding: 24px;
         //background-color: white;
     }
@@ -35,7 +39,6 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
-
     }
 
     .links {
@@ -52,9 +55,7 @@
         gap: 50px;
         text-decoration: none;
         color: black;
-        
 
-        
         .logo {
             height: 72px;
             aspect-ratio: 3.21;

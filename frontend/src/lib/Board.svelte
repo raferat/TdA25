@@ -1,21 +1,41 @@
 <script lang="ts">
     import { createGame, defaultGameBase, type GameBase } from "$lib/api";
-    import { expoOut } from "svelte/easing";
-    import { fade } from "svelte/transition";
+    import { expoOut, sineOut } from "svelte/easing";
+    import { fade, fly } from "svelte/transition";
+    import { isWinMove } from "./boardutil";
+    import { onMount } from "svelte";
     
 
-    let { value = $bindable(defaultGameBase()) }: { value?: GameBase } =
-        $props();
+    let { 
+        value = $bindable(defaultGameBase()), 
+        onwin = () => {} 
+    }: { 
+        value?: GameBase, 
+        onwin?: () => void 
+    } = $props();
 
-    let nextSymbol = "X";
+    let nextSymbol: "X" | "O" = $state("X");
+    let isPlaying = $state(true);
 
     function click(x: number, y: number) {
         value.board[y][x] = nextSymbol;
-        nextSymbol = nextSymbol == "X" ? "O" : "X";
+        if ( isWinMove(value.board, x, y, nextSymbol) ) {
+            isPlaying = false;
+            onwin();
+        } else {
+            nextSymbol = nextSymbol == "X" ? "O" : "X";
+        }
     }
+
+    $effect(() => {
+        if ( value != undefined )
+            isPlaying = true;
+    });
 </script>
 
-<div class="wrapper">
+
+{#if isPlaying}
+<div class="wrapper" in:fade={{delay: 300}} out:fade={{duration: 250}}>
     <div class="board">
         {#each value.board as row, y}
             {#each row as elem, x}
@@ -35,16 +55,91 @@
             {/each}
         {/each}
     </div>
+    <div class="indicator">
+        <h3>Na tahu: 
+            <span class="moveicon"
+                class:o={nextSymbol == "O"}
+                class:x={nextSymbol == "X"}>
+            </span>
+        </h3>
+    </div>
 </div>
+{:else}
+<div class="winner-wrapper" 
+    out:fly={{y: -50, duration: 250, easing: sineOut}} 
+    in:fly={{y: -50, duration: 250, delay: 250, easing: sineOut}}
+    >
+    <div class="winner">
+        {#if nextSymbol == "X"}
+        Vyhrál:
+        {:else}
+        Vyhrálo:
+        {/if}
+        <span 
+            out:fly={{y: -50, duration: 300, easing: sineOut}} 
+            in:fly={{y: -50, duration: 300, delay: 250, easing: sineOut}}
+            class="moveicon"
+            class:o={nextSymbol == "O"}
+            class:x={nextSymbol == "X"}>
+        </span>
+    </div>
+</div>
+{/if}
 
 
 
 <style lang="scss">
-    .wrapper {
-        
-        aspect-ratio: 1;
+    .winner-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .winner {
+            margin: auto;
+            font-size: 30pt;
 
+
+            .moveicon {
+                
+                display: block;
+                margin: auto;
+                margin-top: 40px;
+                width: 100px;
+                height: 100px;
+
+                background-repeat: no-repeat;
+            }
+        }
+    }
+
+
+    .indicator {
+        text-align: center;
+
+        h3 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 250ms cubic-bezier(1, 0, 0, 1);
+
+            span {
+                width: 1.4rem;
+                height: 1.4rem;
+                transition: all 250ms ease-in-out;
+            }
+        }
+        
+    }
+
+    .wrapper {
+        max-height: 100%;
+        max-width: 100%;
+        height: 100%;
+        width: 100%;
         .board {
+            max-width: 100%;
+            max-height: calc(100% - 2.6em);
+            margin: auto;
             display: grid;
             grid-template-columns: repeat(15, 1fr);
             grid-template-rows: repeat(15, 1fr);
@@ -60,11 +155,16 @@
                 border-radius: 0;
                 background: #F6F6F6;
                 color: black;
+                cursor: pointer;
+
+                &:disabled {
+                    cursor: default;
+                }
             }
         }
     }
 
-    div.moveicon {
+    .moveicon {
         width: 100%;
         height: 100%;
 

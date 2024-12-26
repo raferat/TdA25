@@ -1,3 +1,5 @@
+export type Board = ("X" | "O" | "")[][];
+
 export interface Game {
     uuid: string,
     createdAt: string,
@@ -5,13 +7,13 @@ export interface Game {
     name: string,
     difficulty: string,
     gameState: string,
-    board: string[][],
+    board: Board,
 }
 
 export interface GameBase {
     name: string,
     difficulty: string,
-    board: string[][],
+    board: Board,
 }
 
 export function defaultGameBase(): GameBase {
