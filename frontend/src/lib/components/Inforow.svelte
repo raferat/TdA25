@@ -48,7 +48,7 @@
     .outer {
         width: 100%;
         position: relative;
-        background-color: #00000010;
+        background-color: #e7e7e7;
         padding: 25px;
         padding-bottom: 10px;
         border-radius: 10px;

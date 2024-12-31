@@ -1,7 +1,3 @@
-<script>
-    import Button from "./Button.svelte";
-</script>
-
 <header>
     <nav>
         <a href="/" aria-label="Logo link pointing about page"
@@ -35,6 +31,7 @@
                     text-decoration: none;
                     color: black;
                     width: 200px;
+                    height: 100%;
                     text-align: center;
                 }
             }
