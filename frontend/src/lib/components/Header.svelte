@@ -6,7 +6,7 @@
         <span></span>
         <a href="/">Úvod</a>
         <a href="/game/">Nová hra</a>
-        <a href="/gamelist/">Seznam úloh</a>
+        <a href="/gamelist/">Úlohy</a>
     </nav>
 </header>
 

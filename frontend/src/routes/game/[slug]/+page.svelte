@@ -298,7 +298,7 @@
         flex-direction: column;
         justify-content: space-between;
 
-        
+        gap: 20px;
     }
 
     .stats {
