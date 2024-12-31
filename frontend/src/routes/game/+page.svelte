@@ -150,6 +150,7 @@
     }
 
     .board-wrapper {
+        overflow: hidden;
         height: calc(100vh - 230px);
 
         & > div {
