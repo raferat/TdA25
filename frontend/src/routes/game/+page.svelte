@@ -162,8 +162,8 @@
         }
 
 
-        width: 100vw;
-        height: calc(100vh - var(--header-height));
+        width: 100dvw;
+        height: calc(100dvh - var(--header-height));
 
         --button-bar-height: 0px;
         --padding: 50px;
@@ -172,10 +172,10 @@
 
     .board-wrapper {
         overflow: hidden;
-        height: calc(100vh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
+        height: calc(100dvh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
 
         & > div {
-            height: calc(100vh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
+            height: calc(100dvh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
             margin: auto;
         }
     }
