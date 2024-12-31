@@ -1,19 +1,26 @@
 export type Board = ("X" | "O" | "")[][];
+export type Difficulty = "beginner" | "easy" | "medium" | "hard" | "extreme";
+export type GameState = "opening" | "midgame" | "endgame" | "unknown";
 
 export interface Game {
     uuid: string,
     createdAt: string,
     updatedAt: string,
     name: string,
-    difficulty: string,
-    gameState: string,
+    difficulty: Difficulty,
+    gameState: GameState,
     board: Board,
 }
 
 export interface GameBase {
     name: string,
-    difficulty: string,
+    difficulty: Difficulty,
     board: Board,
+}
+
+export interface ApiError {
+    code: number,
+    message: string,
 }
 
 export function defaultGameBase(): GameBase {
@@ -24,28 +31,48 @@ export function defaultGameBase(): GameBase {
     };
 }
 
-export async function listGames(): Promise<Game[]> {
-    const res = await fetch("/api/v1/games");
-    const json = await res.json()
+export async function listGames(fetchFunc=fetch): Promise<[Game[], ApiError | undefined]> {
+    const res = await fetchFunc("/api/v1/games");
 
-    return json
+    let json;
+
+    try {
+        json = await res.json();
+    } catch (e) {
+        json = {code: res.status, message: "Not json response"};
+    }
+
+    if (json["code"] === undefined) {
+        return [json, undefined]
+    }
+    return [[], json]
 }
 
-export async function findGame(uuid: string): Promise<Game> {
-    const res = await fetch(`/api/v1/games/${uuid}`);
-    const json = await res.json()
+export async function findGame(uuid: string, fetchFunc=fetch): Promise<[Game, ApiError | undefined]> {
+    const res = await fetchFunc(`/api/v1/games/${uuid}`);
 
-    return json
+    let json;
+
+    try {
+        json = await res.json();
+    } catch (e) {
+        json = {code: res.status, message: "Not json response"};
+    }
+
+    if (json["code"] === undefined) {
+        return [json, undefined]
+    }
+    return [json, json]
 }
 
-export async function deleteGame(uuid: string): Promise<void> {
-    await fetch(`/api/v1/games/${uuid}`, {
+export async function deleteGame(uuid: string, fetchFunc=fetch): Promise<void> {
+    await fetchFunc(`/api/v1/games/${uuid}`, {
         method: 'DELETE'
     });
 }
 
-export async function createGame(base: GameBase): Promise<Game> {
-    const result = await fetch('/api/v1/games', {
+export async function createGame(base: GameBase, fetchFunc=fetch): Promise<[Game, ApiError | undefined]> {
+    const result = await fetchFunc('/api/v1/games', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -54,11 +81,17 @@ export async function createGame(base: GameBase): Promise<Game> {
         body: JSON.stringify(base),
     })
 
-    return await result.json();
+    const json = await result.json();
+
+    if (json["code"] === undefined) {
+        return [json, undefined]
+    }
+
+    return [json, json]
 }
 
-export async function updateGame(base: GameBase, uuid: string): Promise<Game> {
-    const result = await fetch(`/api/v1/games/${uuid}`, {
+export async function updateGame(base: GameBase, uuid: string, fetchFunc=fetch): Promise<[Game, ApiError | undefined]> {
+    const result = await fetchFunc(`/api/v1/games/${uuid}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -67,5 +100,11 @@ export async function updateGame(base: GameBase, uuid: string): Promise<Game> {
         body: JSON.stringify(base),
     })
 
-    return await result.json();
+    const json = await result.json();
+
+    if (json["code"] === undefined) {
+        return [json, undefined]
+    }
+
+    return [json, json]
 }

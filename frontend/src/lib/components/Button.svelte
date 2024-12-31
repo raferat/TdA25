@@ -6,29 +6,30 @@
         variant = "red",
         href = undefined,
         onclick = undefined,
+        scaleDown = false,
     }: {
         children: Snippet<[]>,
         variant?: "red" | "blue";
         href?: string;
-        onclick?: (a: MouseEvent) => void;
-        
+        scaleDown?: boolean,
+        onclick?: (a: MouseEvent) => void,
     } = $props();
 </script>
 
 {#if href}
-<a {href} class:blue={variant == "blue"} class:red={variant == "red"}>
+<a {href} class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown}>
     <center>
         {@render children()}
     </center>
 </a>
 {:else if onclick}
-<button {onclick} class:blue={variant == "blue"} class:red={variant == "red"}>
+<button {onclick} class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown}>
     <center>
         {@render children()}
     </center>
 </button>
 {:else}
-<div class:blue={variant == "blue"} class:red={variant == "red"}>
+<div class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown}>
     <center>
         {@render children()}
     </center>
@@ -38,21 +39,26 @@
 <style lang="scss">
     @use 'sass:color';
 
+    .size {
+        width: 215px;
+        height: 60px;
+        font-size: 15pt;
+        padding: 20px 60px;
+    }
+
     a, button, div {
         display: block;
         border: none;
         background: none;
-        min-width: 238px;
-        min-height: 76px;
-        padding: 20px 60px;
-        margin: 0;
 
+        
+        margin: 0;
 
         color: #F6F6F6;
         text-decoration: none;
         cursor: pointer;
         border-radius: 10px;
-        font-size: 24pt;
+        
         transition: all 150ms cubic-bezier(0.445, 0.05, 0.55, 0.95);
     }
 

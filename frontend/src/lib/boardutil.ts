@@ -29,3 +29,21 @@ function getSymbolsInDirection(direction: {x: number, y: number}, board: Board, 
     }
     return cnt;
 }
+
+export function calculateNextSymbol(board: Board): "X" | "O" {
+    let cntX = 0;
+    let cntO = 0;
+
+    for (const row of board) {
+        for (const element of row) {
+            if (element == "X")
+                cntX ++;
+            else if (element == "O")
+                cntO ++;
+        }
+    }
+
+    if (cntX > cntO)
+        return "O";
+    return "X";
+}

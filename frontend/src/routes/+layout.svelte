@@ -1,17 +1,28 @@
-<script>
-    import Header from "$lib/Header.svelte";
+<script lang="ts">
+    import Header from "$lib/components/Header.svelte";
 
     const { children } = $props();
+
+    let clientWidth: number = $state(0);
+    let clientHeight: number = $state(0);
 </script>
-<div id="content">
-<Header/>
-{@render children()}
+<div id="outer">
+    <div bind:clientWidth={clientWidth} bind:clientHeight={clientHeight}>
+        <Header/>
+    </div>
+    <div id="content" style="height: calc(100vh - {clientHeight}px);">
+        {@render children()}
+    </div>
 </div>
 
 <style>
-    #content {
+    #outer {
         width: 100vw;
         height: 100vh;
         overflow: hidden;
+    }
+
+    #content {
+        width: 100vw;
     }
 </style>

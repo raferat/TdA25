@@ -1,36 +1,45 @@
 <script lang="ts">
-    import { createGame, defaultGameBase, type GameBase } from "$lib/api";
+    import { defaultGameBase, type Game, type GameBase } from "$lib/api";
     import { expoOut, sineOut } from "svelte/easing";
     import { fade, fly } from "svelte/transition";
-    import { isWinMove } from "./boardutil";
+    import { calculateNextSymbol, isWinMove } from "../boardutil";
     
 
     let { 
-        value = $bindable(defaultGameBase()), 
-        onwin = () => {} 
+        value = $bindable(defaultGameBase()),
+        controls = true,
+        onwin = () => {},
+        onmove = () => {},
     }: { 
-        value?: GameBase, 
-        onwin?: () => void 
+        value?: GameBase | Game, 
+        controls?: boolean,
+        onwin?: () => void,
+        onmove?: () => void,
     } = $props();
 
-    let nextSymbol: "X" | "O" = $state("X");
+
+    let nextSymbol: "X" | "O" = $derived(calculateNextSymbol(value.board));
     let isPlaying = $state(true);
 
     function click(x: number, y: number) {
-        value.board[y][x] = nextSymbol;
-        if ( isWinMove(value.board, x, y, nextSymbol) ) {
+        if (!controls) return;
+
+        const isWin = isWinMove(value.board, x, y, nextSymbol);
+        
+        if ( isWin ) {
             isPlaying = false;
             onwin();
         } else {
-            nextSymbol = nextSymbol == "X" ? "O" : "X";
+            value.board[y][x] = nextSymbol;
+            onmove();
         }
+
+        
     }
 
     $effect(() => {
-        
         if ( value != undefined )
             isPlaying = true;
-        nextSymbol = "X";
     });
 </script>
 
@@ -56,6 +65,7 @@
             {/each}
         {/each}
     </div>
+    {#if controls}
     <div class="indicator">
         <h3>Na tahu: 
             <span class="moveicon"
@@ -64,6 +74,7 @@
             </span>
         </h3>
     </div>
+    {/if}
 </div>
 {:else}
 <div class="winner-wrapper" 
