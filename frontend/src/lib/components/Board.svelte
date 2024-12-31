@@ -111,7 +111,6 @@
 
 
             .moveicon {
-                
                 display: block;
                 margin: auto;
                 margin-top: 40px;
@@ -179,6 +178,7 @@
     .moveicon {
         width: 100%;
         height: 100%;
+        background-repeat: no-repeat;
 
         &.x {
             background-image: url("/icons/X/X_cervene.svg");

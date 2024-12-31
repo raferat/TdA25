@@ -90,6 +90,8 @@
                 <div transition:slide={{ axis: "x", duration: 250 }}>
                     <Button variant="blue" onclick={saveGame}>Uložit</Button>
                 </div>
+            {:else}
+                <div></div>
             {/if}
             <Button onclick={newGame}>
                 <div transition:fade>
@@ -105,12 +107,15 @@
 </main>
 
 <style lang="scss">
-    .font-14pt {
-        font-size: 14pt;
-    }
-
     main {
         position: relative;
+    }
+
+    .font-14pt {
+        font-size: 14pt;
+        @media screen and (max-width: 1022px) {
+            font-size: 12pt;
+        }
     }
 
     .save-wrapper {
@@ -143,18 +148,34 @@
         display: grid;
         grid-template-columns: 0.3fr 0.8fr 0.3fr;
 
-        width: 100vw;
-        height: calc(100vh - 130px);
+        @media screen and (max-width: 1284px) and (min-width: 1022px) {
+            grid-template-columns: 0fr 0.8fr 0.3fr;
+        }
 
+        @media screen and (max-width: 1022px) {
+            display: flex;
+            flex-direction: column;
+
+            padding: 20px;
+            --padding: 20px;
+            --button-bar-height: 80px;
+        }
+
+
+        width: 100vw;
+        height: calc(100vh - var(--header-height));
+
+        --button-bar-height: 0px;
+        --padding: 50px;
         padding: 50px;
     }
 
     .board-wrapper {
         overflow: hidden;
-        height: calc(100vh - 230px);
+        height: calc(100vh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
 
         & > div {
-            height: calc(100vh - 230px);
+            height: calc(100vh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
             margin: auto;
         }
     }
@@ -165,5 +186,12 @@
         justify-content: end;
         align-items: end;
         gap: 20px;
+
+        @media screen and (max-width: 1022px) {
+            padding-top: 20px;
+            flex-direction: row-reverse;
+
+            justify-content: space-between;
+        }
     }
 </style>
