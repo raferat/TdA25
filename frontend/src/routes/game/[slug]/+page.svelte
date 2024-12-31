@@ -19,6 +19,9 @@
     let editingGameOverlayVisible: boolean = $state(false);
     let editedGameBase: GameBase | undefined = $state(undefined);
     let deleteGameOverlayVisible: boolean = $state(false);
+    let mainClientWidth: number = $state(0);
+    let gameInfoButtonVisible: boolean = $derived(mainClientWidth <= 1022);
+    let gameInfoOverlayVisible: boolean = $state(false);
 
     async function processData(gameData: Promise<[Game, ApiError | undefined]>) {
         const [val, err] = await gameData;
@@ -56,6 +59,8 @@
 
     function startEditing() {
         if (!game) return;
+
+        gameInfoOverlayVisible = false;
 
         editedGameBase = {
             board: game.board,
@@ -95,6 +100,10 @@
         deleteGameOverlayVisible = !deleteGameOverlayVisible;
     }
 
+    function toggleInfoOverlay() {
+        gameInfoOverlayVisible = !gameInfoOverlayVisible;
+    }
+
     async function confirmGameDelete() {
         if (!game) return;
         await deleteGame(game.uuid);
@@ -109,8 +118,28 @@
     const permanentURL = page.url.host + page.url.pathname;
 </script>
 
+
+{#snippet stats(game: Game)}
+<div class="stats">
+    <Inforow key="Jméno hry" text={game.name} />
+    <Inforow key="Obtížnost" text={translateDifficulty(game.difficulty)} />
+    <Inforow key="Stav hry" text={translateGameState(game.gameState)} />
+    <Inforow key="Vytvořeno" text={formatDate(game.createdAt)} />
+    <Inforow key="Poslední úprava" text={formatDate(game.updatedAt)} />
+    <Inforow key="Permanentní odkaz" text={permanentURL} minify={true}>
+        {#snippet renderer(text)}
+            <a href="{page.url.protocol}//{permanentURL}">{text}</a>
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <span onclick={copyText(`${page.url.protocol}//${permanentURL}`)} class="copy-icon"></span>
+        {/snippet}
+    </Inforow>
+</div>
+{/snippet}
+
+
 {#if game}
-    <main>
+    <main bind:clientWidth={mainClientWidth}>
         <Overlay bind:visible={editingGameOverlayVisible}>
             <div class="edit-wrapper" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>
                 <h2>Upravit údaje:</h2>
@@ -148,6 +177,14 @@
                 </div>
             </div>
         </Overlay>
+        <Overlay bind:visible={gameInfoOverlayVisible}>
+            <div class="edit-wrapper" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>
+                {@render stats(game)}
+                <Button variant="blue" scaleDown={true} onclick={startEditing}><div class="font-15pt">Upravit</div></Button>
+            </div>
+        </Overlay>
+
+
         <div class="game">
             <div class="board-wrapper">
                 <div transition:blur>
@@ -156,24 +193,18 @@
             </div>
 
             <div class="sidebar">
-                <div class="stats">
-                    <Inforow key="Jméno hry" text={game.name} />
-                    <Inforow key="Obtížnost" text={translateDifficulty(game.difficulty)} />
-                    <Inforow key="Stav hry" text={translateGameState(game.gameState)} />
-                    <Inforow key="Vytvořeno" text={formatDate(game.createdAt)} />
-                    <Inforow key="Poslední úprava" text={formatDate(game.updatedAt)} />
-                    <Inforow key="Permanentní odkaz" text={permanentURL} minify={true}>
-                        {#snippet renderer(text)}
-                            <a href="{page.url.protocol}//{permanentURL}">{text}</a>
-                            <!-- svelte-ignore a11y_no_static_element_interactions -->
-                            <!-- svelte-ignore a11y_click_events_have_key_events -->
-                            <span onclick={copyText(`${page.url.protocol}//${permanentURL}`)} class="copy-icon"></span>
-                        {/snippet}
-                    </Inforow>
-                </div>
+                {#if !gameInfoButtonVisible}
+                {@render stats(game)}
+                {/if}
                 <div class="controls">
-                    <Button variant="blue" scaleDown={true} onclick={startEditing}><div class="font-15pt">Upravit</div></Button>
+                    
+                    {#if gameInfoButtonVisible}
+                        <Button variant="blue" scaleDown={true} onclick={toggleInfoOverlay}><div class="font-15pt">Info</div></Button>
+                    {:else}
+                        <Button variant="blue" scaleDown={true} onclick={startEditing}><div class="font-15pt">Upravit</div></Button>
+                    {/if}
                     <Button scaleDown={true} onclick={toggleDeleteOverlay}><div class="font-15pt">Smazat</div></Button>
+                    
                 </div>
             </div>
             
@@ -190,29 +221,48 @@
 
     .font-14pt {
         font-size: 14pt;
+        @media screen and (max-width: 1022px) {
+            font-size: 12pt;
+        }
     }
 
     .font-15pt {
         font-size: 15pt;
         padding: 20px;
+
+        @media screen and (max-width: 1022px) {
+            font-size: 13pt;
+            padding: 12px;
+        }
     }
 
     .game {
         display: grid;
         grid-template-columns: 0.8fr 0.3fr;
+        gap: 20px;
+
+        @media screen and (max-width: 1022px) {
+            display: flex;
+            flex-direction: column;
+
+            padding: 20px;
+            --padding: 20px;
+            --button-bar-height: 68px;
+        }
 
         width: 100vw;
-        height: calc(100vh - 130px);
-
+        height: calc(100vh - var(--header-height));
+        --button-bar-height: 0px;
+        --padding: 50px;
         padding: 50px;
     }
 
     .board-wrapper {
         overflow: hidden;
-        height: calc(100vh - 230px);
+        height: calc(100vh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
 
         & > div {
-            height: calc(100vh - 230px);
+            height: calc(100vh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
             margin: auto;
         }
     }
@@ -220,7 +270,7 @@
     .edit-wrapper {
         font-size: 16pt;
         max-width: 500px;
-        max-height: 500px;
+        //max-height: 500px;
         background-color: white;
         box-shadow: 2px 2px 20px #666;
         border-radius: 5px;
@@ -243,30 +293,29 @@
         }
     }
 
-    
-
     .sidebar {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
 
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-auto-rows: 1fr;
-            gap: 20px;
-            width: 100%;
-            height: min-content;
-        }
+        
+    }
 
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            width: 100%;
-            gap: 20px;
+    .stats {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-auto-rows: 1fr;
+        gap: 20px;
+        width: 100%;
+        height: min-content;
+    }
 
-            justify-content: space-between;
-        }
+    .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 20px;
+        justify-content: space-between;
     }
 
     .copy-icon {

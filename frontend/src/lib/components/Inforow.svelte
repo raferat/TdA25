@@ -18,7 +18,7 @@
 
 
     const minification = (a: string) => {
-        const len = 35;
+        const len = 25;
         let result = a.slice(0, len/2);
         result += "....";
         result += a.slice(a.length-len/2);
