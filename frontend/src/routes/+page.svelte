@@ -7,6 +7,7 @@
 
 <h1>Vítejte u piškvorek</h1>
 <a href="/game/default" style="display: none;">Hello TdA</a>
+<a href="/game/default/edit" style="display: none;">Hello TdA</a>
 
 <ol>
     <li>Organizace: Think different Academy se zaměřuje na volnočasové a vzdělávací aktivity pro děti a mládež.</li>

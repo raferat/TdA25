@@ -8,12 +8,12 @@
     let { 
         value = $bindable(defaultGameBase()),
         controls = true,
-        onwin = () => {},
+        onwin = (winner: "X" | "O") => {},
         onmove = () => {},
     }: { 
         value?: GameBase | Game, 
         controls?: boolean,
-        onwin?: () => void,
+        onwin?: (winner: "X" | "O") => void,
         onmove?: () => void,
     } = $props();
 
@@ -28,13 +28,11 @@
         
         if ( isWin ) {
             isPlaying = false;
-            onwin();
+            onwin(nextSymbol);
         } else {
             value.board[y][x] = nextSymbol;
             onmove();
         }
-
-        
     }
 
     $effect(() => {
