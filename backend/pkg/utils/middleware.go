@@ -3,9 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/andybalholm/brotli"
 	"github.com/fatih/color"
 )
 
@@ -64,4 +67,59 @@ func JSONEncodeMiddleware(next JSONReturnFunction) http.Handler {
 			enc.Encode(obj)
 		}
 	})
+}
+
+//======================================================= Compression =======================================================
+
+type redirectedWriter struct {
+	w http.ResponseWriter
+	r io.Writer
+}
+
+func (r *redirectedWriter) Header() http.Header {
+	return r.w.Header()
+}
+
+func (r *redirectedWriter) WriteHeader(code int) {
+	r.w.WriteHeader(code)
+}
+
+func (r *redirectedWriter) Write(p []byte) (int, error) {
+	n, err := r.r.Write(p)
+	return n, err
+}
+
+func NewRedirectedWriter(parent http.ResponseWriter, redirect io.Writer) http.ResponseWriter {
+	return &redirectedWriter{
+		w: parent,
+		r: redirect,
+	}
+}
+
+func CompressionMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !canCompress(r) {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		w.Header().Add("Content-Encoding", "br")
+		encoder := brotli.NewWriterLevel(w, 5)
+		rw := NewRedirectedWriter(w, encoder)
+		next.ServeHTTP(rw, r)
+		encoder.Flush()
+		encoder.Close()
+	})
+}
+
+func canCompress(r *http.Request) bool {
+	if val, ok := r.Header["Accept-Encoding"]; ok {
+		for _, v := range val {
+			if strings.Contains(v, "br") {
+				return true
+			}
+		}
+		fmt.Printf("%#v\n", val[0])
+	}
+	return false
 }

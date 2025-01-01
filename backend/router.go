@@ -18,7 +18,7 @@ func router(mux *http.ServeMux) http.Handler {
 	mux.Handle("/api/", http.StripPrefix("/api", registerApiRoutes()))
 	mux.Handle("/", fileRouter("./website", "fallback.html"))
 
-	return utils.LoggingMiddleware(mux)
+	return utils.LoggingMiddleware(utils.CompressionMiddleware(mux))
 }
 
 func registerApiRoutes() http.Handler {
