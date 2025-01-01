@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"tdaserver/pkg/api"
 	"tdaserver/pkg/utils"
@@ -54,6 +56,22 @@ func fileRouter(static string, fallback string) http.Handler {
 			return
 		}
 
+		if time := shouldBeCached(filePath); time != 0 {
+			w.Header().Add("Cache-Control", fmt.Sprintf("max-age=%d", time))
+		}
+
 		fileServer.ServeHTTP(w, r)
 	})
+}
+
+func shouldBeCached(path string) int {
+	if strings.HasSuffix(path, ".ttf") || strings.HasSuffix(path, ".svg") || strings.HasSuffix(path, ".png") {
+		return 31536000
+	}
+
+	if strings.HasSuffix(path, ".js") {
+		return 86400
+	}
+
+	return 3600
 }

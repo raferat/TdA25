@@ -1,4 +1,9 @@
 <script lang="ts">
+    import { untrack } from "svelte";
+    import { flip } from "svelte/animate";
+    import { sineInOut } from "svelte/easing";
+    import { fade } from "svelte/transition";
+
     type IconClass =
         | "beginner"
         | "duck"
@@ -21,9 +26,12 @@
         iconClass: IconClass;
     }
 
-    let { height: containerHeight }: { height: number } = $props();
+    let { height: containerHeight, width: containerWidth }: { height: number, width: number } = $props();
 
-    const icons: Array<MyIcon> = [];
+    let lastH = 0;
+    let lastW = 0;
+
+    let icons: Array<MyIcon> = $state([]);
     const possibilities: ReadonlyArray<IconClass> = [
         "beginner",
         "duck",
@@ -39,6 +47,8 @@
         "logo-text1",
         "logo-text2",
         "playing",
+        "playing",
+        "thinking",
         "thinking",
         "x",
         "x",
@@ -46,27 +56,49 @@
         "logo-erb",
     ];
 
-    const cellWidth = 175;
-    const cellHeight = 175;
+    async function createIconicBackground(containerHeight: number, containerWidth: number) {
+        const cellWidth = 175;
+        const cellHeight = 175;
 
-    const iconWidth = 60;
-    const iconHeight = 60;
+        const iconWidth = 60;
+        const iconHeight = 60;
 
-    for (let xidx = 0; xidx < 50; xidx++) {
-        for (let yidx = 0; yidx < 50; yidx++) {
-            const cls = possibilities[Math.floor(Math.random() * possibilities.length)];
-            const x = cellWidth * xidx + (cellWidth - iconWidth) * Math.random();
-            const y = cellHeight * yidx + (cellHeight - iconHeight) * Math.random();
-            icons.push({ x: x, y: y, iconClass: cls });
+        const rowCnt = Math.ceil(containerHeight/cellHeight);
+        const colCnt = Math.ceil(containerWidth/cellWidth);
+
+        const localIcons: Array<MyIcon> = [];
+
+        for (let xidx = 0; xidx < colCnt; xidx++) {
+            for (let yidx = 0; yidx < rowCnt; yidx++) {
+                const cls = possibilities[Math.floor(Math.random() * possibilities.length)];
+                const x = cellWidth * xidx + (cellWidth - iconWidth) * Math.random();
+                const y = cellHeight * yidx + (cellHeight - iconHeight) * Math.random();
+                localIcons.push({ x: x, y: y, iconClass: cls });
+            }
         }
+
+        icons = localIcons;
     }
+
+    $effect(() => {
+        let h = Math.max(containerHeight, window.screen.height);
+        let w = Math.max(containerWidth, window.screen.width);
+        untrack(() => {
+            if ( h == lastH && w == lastW ) return;
+            lastH = h;
+            lastW = w;
+            createIconicBackground(h, w);
+        });
+    });
 </script>
 
 <div class="background" style="height: {containerHeight}px">
-    {#each icons as icon}
+    {#each icons as icon, idx (idx)}
         <div
+            animate:flip={{delay: 5+idx, duration: 1000, easing: sineInOut}}
+            transition:fade
             class="icon {icon.iconClass}"
-            style="top: {icon.x}px; left: {icon.y}px"
+            style="top: {icon.y}px; left: {icon.x}px"
         ></div>
     {/each}
 </div>
@@ -92,6 +124,7 @@
         background-size: 48px 48px;
         filter: opacity(7%);
         background-position: center;
+        transition: background-image 500ms ease-in-out;
 
         &.beginner {
             background-image: url("/icons/Beginner/zarivka_beginner_cerne.svg");

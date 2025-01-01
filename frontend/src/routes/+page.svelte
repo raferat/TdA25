@@ -1,5 +1,13 @@
+<svelte:head>
+    <meta 
+        name="description" 
+        content="Piškovrková platforma, která přináší zábavu i poučení. Rozdejte si partii piškvorek s přáteli, nebo zkuste vyřešit jednu z našich úloh.
+            Organizace: Think different Academy">
+</svelte:head>
+
 <h1>Vítejte u piškvorek</h1>
 <a href="/game/default" style="display: none;">Hello TdA</a>
+
 <ol>
     <li>Organizace: Think different Academy se zaměřuje na volnočasové a vzdělávací aktivity pro děti a mládež.</li>
     <li>Prezenční aktivity: Nabízí skvělé prezenční aktivity a publikace s logickými úlohami.</li>
