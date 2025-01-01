@@ -49,58 +49,6 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-//======================================================== Not Found ========================================================
-
-type fakeWriter struct {
-	writer     http.ResponseWriter
-	shouldStop func(statusCode int) bool
-	stopped    bool
-	statusCode int
-}
-
-func (w *fakeWriter) WriteHeader(a int) {
-	w.statusCode = a
-	w.stopped = w.shouldStop(a)
-
-	if !w.stopped {
-		w.writer.WriteHeader(a)
-	}
-}
-
-func (w *fakeWriter) Write(arr []byte) (int, error) {
-	if w.stopped {
-		return len(arr), nil
-	}
-
-	return w.writer.Write(arr)
-}
-
-func (w *fakeWriter) Header() http.Header {
-	if w.stopped {
-		return make(http.Header)
-	}
-
-	return w.writer.Header()
-}
-
-func NotFoundMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		wrapped := &fakeWriter{
-			writer: w,
-			shouldStop: func(a int) bool {
-				return a >= 400
-			},
-		}
-		next.ServeHTTP(wrapped, r)
-		if !wrapped.stopped {
-			return
-		}
-
-		w.Header().Add("Location", "/404.html")
-		w.WriteHeader(http.StatusMovedPermanently)
-	})
-}
-
 //======================================================= JSON Encode =======================================================
 
 type JSONReturnFunction func(r *http.Request) (code int, object any)
