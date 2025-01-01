@@ -27,17 +27,22 @@
     const possibilities: ReadonlyArray<IconClass> = [
         "beginner",
         "duck",
+        "duck",
         "easy",
         "extreme",
         "hard",
         "idea",
+        "idea",
         "medium",
+        "o",
         "o",
         "logo-text1",
         "logo-text2",
         "playing",
         "thinking",
         "x",
+        "x",
+        "logo-erb",
         "logo-erb",
     ];
 
