@@ -119,7 +119,6 @@ func canCompress(r *http.Request) bool {
 				return true
 			}
 		}
-		fmt.Printf("%#v\n", val[0])
 	}
 	return false
 }
