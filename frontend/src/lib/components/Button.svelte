@@ -7,29 +7,31 @@
         href = undefined,
         onclick = undefined,
         scaleDown = false,
+        disabled = false,
     }: {
         children: Snippet<[]>,
         variant?: "red" | "blue";
         href?: string;
         scaleDown?: boolean,
         onclick?: (a: MouseEvent) => void,
+        disabled?: boolean,
     } = $props();
 </script>
 
 {#if href}
-<a {href} class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown}>
+<a {href} class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown} class:disabled={disabled}>
     <center>
         {@render children()}
     </center>
 </a>
 {:else if onclick}
-<button {onclick} class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown}>
+<button {onclick} class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown} class:disabled={disabled}>
     <center>
         {@render children()}
     </center>
 </button>
 {:else}
-<div class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown}>
+<div class:blue={variant == "blue"} class:red={variant == "red"} class:size={!scaleDown} class:disabled={disabled}>
     <center>
         {@render children()}
     </center>
@@ -60,6 +62,12 @@
         border-radius: 10px;
         
         transition: all 150ms cubic-bezier(0.445, 0.05, 0.55, 0.95);
+
+        &.disabled {
+            pointer-events: none;
+            background-color: grey;
+            cursor: not-allowed;
+        }
     }
 
     .red {

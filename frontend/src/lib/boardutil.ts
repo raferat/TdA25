@@ -47,3 +47,20 @@ export function calculateNextSymbol(board: Board): "X" | "O" {
         return "O";
     return "X";
 }
+
+export function isBoardCorrect(board: Board | undefined): boolean {
+    if (board == undefined) return false;
+    let cntX = 0;
+    let cntO = 0;
+
+    for (const row of board) {
+        for (const element of row) {
+            if (element == "X")
+                cntX ++;
+            else if (element == "O")
+                cntO ++;
+        }
+    }
+
+    return cntX == cntO+1 || cntX == cntO;
+}

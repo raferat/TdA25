@@ -1,7 +1,21 @@
 package utils
 
-func CalculateGameState([][]string) string {
-	return "unknown"
+func CalculateGameState(board [][]string) string {
+	x, o := countMoves(board)
+
+	if CanWinInNextTurn(board, x, o) {
+		return "endgame"
+	}
+
+	if o < 5 {
+		return "opening"
+	}
+
+	return "midgame"
+}
+
+func CanWinInNextTurn(board [][]string, x, o int) bool {
+	return false
 }
 
 // returns true when Difficulty is OK
@@ -33,30 +47,27 @@ func CheckIntegrity(board [][]string) (bool, string) {
 		return false, "Board contains unrecognizable characters"
 	}
 
-	if !checkMoves(board) {
+	if x, o := countMoves(board); x != o && x != o+1 {
 		return false, "Board contains invalid number of player moves"
 	}
 
 	return true, ""
 }
 
-func checkMoves(board [][]string) bool {
+func countMoves(board [][]string) (int, int) {
 	x := 0
 	o := 0
 	for _, r := range board {
 		for _, c := range r {
-			if len(c) == 0 {
-				continue
-			}
 			if c == "X" {
 				x++
-			} else {
+			} else if c == "O" {
 				o++
 			}
 		}
 	}
 
-	return x == o || x == o+1
+	return x, o
 }
 
 func checkContent(board [][]string) bool {

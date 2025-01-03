@@ -58,8 +58,7 @@
     <Inforow key="Jméno hry" text={game.name} />
     <Inforow key="Obtížnost" text={translateDifficulty(game.difficulty)} />
     <Inforow key="Stav hry" text={translateGameState(game.gameState)} />
-    <Inforow key="Vytvořeno" text={formatDate(game.createdAt)} />
-    <Inforow key="Poslední úprava" text={formatDate(game.updatedAt)} />
+    <Inforow key="Úloha dne" text={formatDate(game.updatedAt)} />
     <Inforow key="Permanentní odkaz" text={permanentURL} minify={true}>
         {#snippet renderer(text)}
             <a href="{page.url.protocol}//{permanentURL}">{text}</a>
@@ -132,6 +131,12 @@
         grid-template-columns: 0.8fr 0.3fr;
         gap: 20px;
 
+        width: 100dvw;
+        height: calc(100dvh - var(--header-height));
+        --button-bar-height: 0px;
+        --padding: 50px;
+        padding: 50px;
+
         @media screen and (max-width: 1022px) {
             display: flex;
             flex-direction: column;
@@ -140,12 +145,6 @@
             --padding: 20px;
             --button-bar-height: 68px;
         }
-
-        width: 100dvw;
-        height: calc(100dvh - var(--header-height));
-        --button-bar-height: 0px;
-        --padding: 50px;
-        padding: 50px;
     }
 
     .board-wrapper {

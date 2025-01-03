@@ -14,7 +14,7 @@ export function formatDate(date: string | Date): string {
     const YY = `${date.getFullYear()}`;
 
 
-    return `${hh}:${mm}:${ss}\xa0\xa0\xa0${dd}.${MM}.${YY}`;
+    return `${dd}.${MM}.${YY}\xa0\xa0${hh}:${mm}:${ss}`;
 }
 
 export function translateGameState(gameState: GameState): string {

@@ -28,7 +28,7 @@
         font-weight: 500;
         border: 2px solid transparent;
         outline: none;
-        background-color: #00000010;
+        background-color: #e7e7e7;
         padding: 20px;
         padding-bottom: 8px;
         border-radius: 10px;
@@ -39,11 +39,11 @@
             border-bottom-left-radius: 0px;
             border-bottom-right-radius: 0px;
             border-bottom: 2px solid #0070BB;
-            background-color: #0808081B;
+            background-color: #cacaca;
         }
 
         &:hover {
-            background-color: #0808081A;
+            background-color: #c9c9c9;
         }
     }
 

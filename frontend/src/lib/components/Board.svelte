@@ -10,19 +10,36 @@
         controls = true,
         onwin = (winner: "X" | "O") => {},
         onmove = () => {},
+        editMode = false,
     }: { 
         value?: GameBase | Game, 
         controls?: boolean,
         onwin?: (winner: "X" | "O") => void,
         onmove?: () => void,
+        editMode?: boolean,
     } = $props();
 
 
     let nextSymbol: "X" | "O" = $derived(calculateNextSymbol(value.board));
     let isPlaying = $state(true);
 
+    function editClick(x: number, y: number) {
+        if (value.board[y][x] == "") {
+            value.board[y][x] = "X";
+        } else if (value.board[y][x] == "X") {
+            value.board[y][x] = "O";
+        } else {
+            value.board[y][x] = "";
+        }
+    }
+
     function click(x: number, y: number) {
         if (!controls) return;
+
+        if (editMode) {
+            editClick(x,y);
+            return;
+        }
 
         const isWin = isWinMove(value.board, x, y, nextSymbol);
         
@@ -49,8 +66,8 @@
             {#each row as elem, x}
                 <button
                     onclick={(evt) => click(x, y)}
-                    disabled={elem != ""}
-                    aria-label="place your symbol">
+                    disabled={elem != "" && !editMode}
+                    aria-label="place your symbol at (x: {x+1}; y: {y+1})">
                     {#if elem != ""}
                         <div
                             in:fade={{ easing: expoOut, duration: 500 }}

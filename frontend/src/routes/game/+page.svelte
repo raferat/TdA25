@@ -117,6 +117,7 @@
             font-size: 12pt;
         }
     }
+    
 
     .save-wrapper {
         font-size: 16pt;
@@ -148,6 +149,13 @@
         display: grid;
         grid-template-columns: 0.3fr 0.8fr 0.3fr;
 
+        width: 100dvw;
+        height: calc(100dvh - var(--header-height));
+
+        --button-bar-height: 0px;
+        --padding: 50px;
+        padding: 50px;
+
         @media screen and (max-width: 1284px) and (min-width: 1022px) {
             grid-template-columns: 0fr 0.8fr 0.3fr;
         }
@@ -162,12 +170,7 @@
         }
 
 
-        width: 100dvw;
-        height: calc(100dvh - var(--header-height));
-
-        --button-bar-height: 0px;
-        --padding: 50px;
-        padding: 50px;
+        
     }
 
     .board-wrapper {

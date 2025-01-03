@@ -1,27 +1,27 @@
 <script lang="ts">
     import Board from "$lib/components/Board.svelte";
     import { blur, fly } from "svelte/transition";
-    import { page } from "$app/state";
-    import { deleteGame, updateGame, type ApiError, type Game, type GameBase } from "$lib/api.js";
+    import { deleteGame, updateGame, type ApiError, type Game } from "$lib/api.js";
+    import "$lib/utils";
     import Button from "$lib/components/Button.svelte";
     import Inforow from "$lib/components/Inforow.svelte";
     import { goto } from "$app/navigation";
-    import { formatDate, translateDifficulty, translateGameState } from "$lib/format";
+    import { formatDate, translateGameState } from "$lib/format";
     import Overlay from "$lib/components/Overlay.svelte";
     import TextInput from "$lib/components/TextInput.svelte";
     import RadioButtons from "$lib/components/RadioButtons.svelte";
     import { circOut, sineInOut } from "svelte/easing";
+    import { isBoardCorrect } from "$lib/boardutil";
 
     const { data }: { data: { gameData: Promise<[Game, ApiError | undefined]>, slug: string } } =
         $props();
 
     let game: Game | undefined = $state(undefined);
-    let editingGameOverlayVisible: boolean = $state(false);
-    let editedGameBase: GameBase | undefined = $state(undefined);
     let deleteGameOverlayVisible: boolean = $state(false);
     let mainClientWidth: number = $state(0);
-    let gameInfoButtonVisible: boolean = $derived(mainClientWidth <= 1022);
+    let gameInfoButtonVisible: boolean = $derived(mainClientWidth <= 1062);
     let gameInfoOverlayVisible: boolean = $state(false);
+    let loading: boolean = $state(false);
 
     async function processData(gameData: Promise<[Game, ApiError | undefined]>) {
         const [val, err] = await gameData;
@@ -32,51 +32,23 @@
         game = val;
     }
 
-    async function onmove() {
-        if (!game) return;
-
-        const [val, err] = await updateGame({
-            board: game?.board,
-            difficulty: game?.difficulty,
-            name: game?.name,
-        }, game?.uuid);
-
-        if (err != undefined) {
-            goto(`/error/?obj=${encodeURIComponent(JSON.stringify(err))}`);
-            return;
-        }
-
-        game.updatedAt = val.updatedAt;
-        game.gameState = val.gameState;
-
-    }
-
-    function startEditing() {
-        if (!game) return;
-
-        gameInfoOverlayVisible = false;
-
-        editedGameBase = {
-            board: game.board,
-            difficulty: game.difficulty,
-            name: game.name,
-        }
-
-        editingGameOverlayVisible = true;
-    }
-
-    function stopEditing() {
-        editingGameOverlayVisible = false;
+    async function saveData() {
+        loading = true;
+        await Promise.all([
+            Promise.after(5000),
+            saveGameData(),
+        ]);
+        loading = false;
     }
 
     async function saveGameData() {
-        if (!editedGameBase) return;
         if (!game) return;
 
+        
         const [val, err] = await updateGame({
-            board: editedGameBase.board,
-            difficulty: editedGameBase.difficulty,
-            name: editedGameBase.name,
+            board: game.board,
+            difficulty: game.difficulty,
+            name: game.name,
         }, game.uuid);
 
         if (err != undefined) {
@@ -87,7 +59,10 @@
         game.gameState = val.gameState;
         game.name = val.name;
         game.difficulty = val.difficulty;
-        stopEditing();
+    }
+
+    function back() {
+        goto("../");
     }
 
     function toggleDeleteOverlay() {
@@ -101,7 +76,7 @@
     async function confirmGameDelete() {
         if (!game) return;
         await deleteGame(game.uuid);
-        goto("/game/");
+        goto("/gamelist/");
     }
 
     $effect(() => {
@@ -113,45 +88,31 @@
 {#snippet stats(game: Game)}
 <div class="stats">
     <TextInput placeholder="Jméno hry:" bind:value={game.name}/>
-    <RadioButtons
-        bind:value={game.difficulty}
-        options={[
-            { display: "Začátečnická", option: "beginner" },
-            { display: "Jednoduchá", option: "easy" },
-            { display: "Středně těžká", option: "medium" },
-            { display: "Těžká", option: "hard" },
-            { display: "Extrémní", option: "extreme" },
-        ]}/>
+    <div>
+        Obtížnost:
+        <RadioButtons
+            bind:value={game.difficulty}
+            options={[
+                { display: "Začátečnická", option: "beginner" },
+                { display: "Jednoduchá", option: "easy" },
+                { display: "Středně těžká", option: "medium" },
+                { display: "Těžká", option: "hard" },
+                { display: "Extrémní", option: "extreme" },
+            ]}/>
+    </div>
+    <br>
+    <br>
+    <Inforow key="Stav hry" text={translateGameState(game.gameState)} />
+    <Inforow key="Vytvořeno" text={formatDate(game.createdAt)} />
+    <Inforow key="Úloha dne" text={formatDate(game.updatedAt)} />
 </div>
 {/snippet}
 
+{#if loading}
+<div>Loading</div>
 
-{#if game}
+{:else if game}
     <main bind:clientWidth={mainClientWidth}>
-        <Overlay bind:visible={editingGameOverlayVisible}>
-            <div class="edit-wrapper" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>
-                <h2>Upravit údaje:</h2>
-                <TextInput bind:value={editedGameBase!.name} placeholder="Jméno" />
-                <div>Obtížnost:</div>
-                <RadioButtons
-                    bind:value={editedGameBase!.difficulty}
-                    options={[
-                        { display: "Začátečnická", option: "beginner" },
-                        { display: "Jednoduchá", option: "easy" },
-                        { display: "Středně těžká", option: "medium" },
-                        { display: "Těžká", option: "hard" },
-                        { display: "Extrémní", option: "extreme" },
-                    ]}/>
-                <div class="save-options">
-                    <Button scaleDown={true} onclick={stopEditing}>
-                        <div class="font-14pt">Zrušit</div>
-                    </Button>
-                    <Button scaleDown={true} variant="blue" onclick={saveGameData}>
-                        <div class="font-14pt">Uložit</div>
-                    </Button>
-                </div>
-            </div>
-        </Overlay>
         <Overlay bind:visible={deleteGameOverlayVisible}>
             <div class="edit-wrapper" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>
                 <h2>Potvrďte smazání.</h2>
@@ -168,7 +129,7 @@
         <Overlay bind:visible={gameInfoOverlayVisible}>
             <div class="edit-wrapper" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>
                 {@render stats(game)}
-                <Button variant="blue" scaleDown={true} onclick={startEditing}><div class="font-15pt">Upravit</div></Button>
+                <Button disabled={!isBoardCorrect(game.board)} variant="blue" scaleDown={true} onclick={saveData}><div class="font-15pt">Uložit</div></Button>
             </div>
         </Overlay>
 
@@ -176,7 +137,7 @@
         <div class="game">
             <div class="board-wrapper">
                 <div transition:blur>
-                    <Board {onmove} onwin={() => console.log("Win")} bind:value={game} />
+                    <Board editMode={true} bind:value={game} />
                 </div>
             </div>
 
@@ -185,14 +146,13 @@
                 {@render stats(game)}
                 {/if}
                 <div class="controls">
-                    
+                    <Button scaleDown={true} onclick={toggleDeleteOverlay}><div class="font-15pt">Smazat</div></Button>
                     {#if gameInfoButtonVisible}
                         <Button variant="blue" scaleDown={true} onclick={toggleInfoOverlay}><div class="font-15pt">Info</div></Button>
                     {:else}
-                        <Button variant="blue" scaleDown={true} onclick={startEditing}><div class="font-15pt">Upravit</div></Button>
+                        <Button disabled={!isBoardCorrect(game.board)} variant="blue" scaleDown={true} onclick={saveData}><div class="font-15pt">Uložit</div></Button>
                     {/if}
-                    <Button scaleDown={true} onclick={toggleDeleteOverlay}><div class="font-15pt">Smazat</div></Button>
-                    
+                    <Button scaleDown={true} onclick={back}><div class="font-15pt">Zpět</div></Button>
                 </div>
             </div>
             
@@ -209,16 +169,16 @@
 
     .font-14pt {
         font-size: 14pt;
-        @media screen and (max-width: 1022px) {
+        @media screen and (max-width: 1062px) {
             font-size: 12pt;
         }
     }
 
     .font-15pt {
-        font-size: 15pt;
-        padding: 20px;
+        font-size: 14pt;
+        padding: 15px;
 
-        @media screen and (max-width: 1022px) {
+        @media screen and (max-width: 1163px) {
             font-size: 13pt;
             padding: 12px;
         }
@@ -229,7 +189,13 @@
         grid-template-columns: 0.8fr 0.3fr;
         gap: 20px;
 
-        @media screen and (max-width: 1022px) {
+        width: 100dvw;
+        height: calc(100dvh - var(--header-height));
+        --button-bar-height: 0px;
+        --padding: 50px;
+        padding: 50px;
+
+        @media screen and (max-width: 1062px) {
             display: flex;
             flex-direction: column;
 
@@ -237,12 +203,6 @@
             --padding: 20px;
             --button-bar-height: 68px;
         }
-
-        width: 100dvw;
-        height: calc(100dvh - var(--header-height));
-        --button-bar-height: 0px;
-        --padding: 50px;
-        padding: 50px;
     }
 
     .board-wrapper {
@@ -289,17 +249,22 @@
     }
 
     .stats {
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-auto-rows: 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 20px;
         width: 100%;
-        height: min-content;
+        font-size: 16pt;
+
+        & > div {
+            background-color: #e7e7e7;
+            padding: 10px 20px 20px 20px;
+            border-radius: 10px;
+        }
     }
 
     .controls {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         width: 100%;
         gap: 20px;
         justify-content: space-between;
