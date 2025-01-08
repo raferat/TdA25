@@ -81,8 +81,8 @@
     }
 
     $effect(() => {
-        let h = Math.max(containerHeight, window.screen.height);
-        let w = Math.max(containerWidth, window.screen.width);
+        let h = Math.max(containerHeight, window.screen.height)*12;
+        let w = Math.max(containerWidth, window.screen.width)*2;
         untrack(() => {
             if ( h == lastH && w == lastW ) return;
             lastH = h;
