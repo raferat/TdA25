@@ -9,13 +9,6 @@ import Header from "$lib/components/Header.svelte";
     let clientHeight: number = $state(0);
 
     let childrenHeight: number = $state(0);
-    let maxChildrenHeight: number = $state(0);
-    $effect(() => {
-        let n = childrenHeight;
-        untrack(() => {
-            maxChildrenHeight = Math.max(maxChildrenHeight, n);
-        });
-    });
 </script>
 
 <div id="outer">

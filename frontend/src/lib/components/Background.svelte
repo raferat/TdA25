@@ -68,8 +68,8 @@
 
         const localIcons: Array<MyIcon> = [];
 
-        for (let xidx = 0; xidx < colCnt; xidx++) {
-            for (let yidx = 0; yidx < rowCnt; yidx++) {
+        for (let yidx = 0; yidx < rowCnt; yidx++) {
+            for (let xidx = 0; xidx < colCnt; xidx++) {
                 const cls = possibilities[Math.floor(Math.random() * possibilities.length)];
                 const x = cellWidth * xidx + (cellWidth - iconWidth) * Math.random();
                 const y = cellHeight * yidx + (cellHeight - iconHeight) * Math.random();
@@ -81,10 +81,10 @@
     }
 
     $effect(() => {
-        let h = Math.max(containerHeight, window.screen.height)*12;
+        let h = Math.max(containerHeight, window.screen.height)*5;
         let w = Math.max(containerWidth, window.screen.width)*2;
         untrack(() => {
-            if ( h == lastH && w == lastW ) return;
+            if ( h <= lastH && w <= lastW ) return;
             lastH = h;
             lastW = w;
             createIconicBackground(h, w);
