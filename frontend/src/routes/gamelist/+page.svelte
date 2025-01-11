@@ -4,6 +4,7 @@
     import { flip } from "svelte/animate";
     import { filterList, type Filters } from "./filter";
     import SearchFilterBar from "./SearchFilterBar.svelte";
+    import { fade, fly, slide } from "svelte/transition";
 
     let list: Game[] | undefined = $state();
     let filter: Filters = $state({});
@@ -33,7 +34,7 @@
     {:else if filteredList}
         <div class="cardlist">
             {#each filteredList as elem (elem.uuid)}
-                <div class="gamecard" animate:flip>
+                <div class="gamecard" animate:flip={{duration: 550}} transition:fly={{duration: 250, x: -200}}>
                     <div>{elem.name}</div>
                     <div>{elem.createdAt}</div>
                     <div>{elem.difficulty}</div>
@@ -49,8 +50,7 @@
     .cardlist {
         padding: 50px;
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 20px;
     }
     .gamecard {

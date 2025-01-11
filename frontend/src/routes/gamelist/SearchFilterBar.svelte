@@ -2,15 +2,17 @@
     import type { Filters } from "./filter";
 
     let { 
-        filters = $bindable(),
+        filters = $bindable({}),
     }: {
         filters?: Filters
     } = $props();
+
+    filters.nameSearch = "";
 </script>
 
 <div id="outer">
     <div id="inner">
-        <input type="text">
+        <input type="text" bind:value={filters.nameSearch}>
     </div>
 </div>
 
