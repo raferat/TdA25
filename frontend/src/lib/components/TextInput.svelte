@@ -2,16 +2,18 @@
     let { 
         value = $bindable(""), 
         placeholder = "",
+        focuseffect = true,
         autofocus = false,
     }: { 
         value?: string, 
         placeholder?: string,
         autofocus?: boolean,
+        focuseffect?: boolean,
     } = $props();
 </script>
 
 <label for="input">
-    <input id="input" class:longtext={value.length > 50} type="text" bind:value={value}>
+    <input id="input" class:focuseffect={focuseffect} class:longtext={value.length > 50} type="text" bind:value={value}>
     <div class="placeholder" class:topleft={value.length > 0}>{placeholder}</div>
 </label>
 
@@ -35,7 +37,7 @@
         transition: all 150ms cubic-bezier(0.445, 0.05, 0.55, 0.95);
         
 
-        &:focus {
+        &.focuseffect:focus {
             border-bottom-left-radius: 0px;
             border-bottom-right-radius: 0px;
             border-bottom: 2px solid #0070BB;
@@ -55,7 +57,7 @@
         cursor: text;
         position: absolute;
         font-size: 13pt;
-        top: 22px;
+        top: 16px;
         left: 22px;
         color: #080808AA;
 

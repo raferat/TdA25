@@ -1,7 +1,6 @@
 <script lang="ts">
     import Background from "$lib/components/Background.svelte";
-import Header from "$lib/components/Header.svelte";
-    import { untrack } from "svelte";
+    import Header from "$lib/components/Header.svelte";
 
     const { children } = $props();
 

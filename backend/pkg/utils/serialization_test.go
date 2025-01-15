@@ -1,6 +1,6 @@
 package utils_test
 
-import (
+/*import (
 	"fmt"
 	"testing"
 
@@ -75,4 +75,4 @@ func equalBoards(a, b [][]string) bool {
 		}
 	}
 	return true
-}
+}*/

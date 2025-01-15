@@ -14,8 +14,76 @@ func CalculateGameState(board [][]string) string {
 	return "midgame"
 }
 
+type Direction [2]int
+
+type cachePos struct {
+	x      int
+	y      int
+	dir    Direction
+	symbol string
+}
+
+func countSymbolInDirection(startX, startY int, board [][]string, symbol string, dir Direction, cache map[cachePos]int) int {
+	x, y := startX+dir[0], startY+dir[1]
+
+	if val, ok := cache[cachePos{startX, startY, dir, symbol}]; ok {
+		return val
+	}
+
+	cnt := 0
+
+	for y >= 0 && x >= 0 && y < len(board) && x < len(board[y]) && board[y][x] == symbol {
+		x += dir[0]
+		y += dir[1]
+		cnt++
+	}
+
+	if y >= 0 && x >= 0 && y < len(board) && x < len(board[y]) {
+		cache[cachePos{x, y, Direction{dir[0] * -1, dir[1] * -1}, symbol}] = cnt
+	}
+
+	return cnt
+}
+
 func CanWinInNextTurn(board [][]string, x, o int) bool {
-	return false
+	type pos struct {
+		x int
+		y int
+	}
+	xWinOpt := 0
+	oWinOpt := 0
+	cache := make(map[cachePos]int)
+
+	if x == o {
+		oWinOpt--
+	} else {
+		xWinOpt--
+	}
+
+	for y, r := range board {
+		for x, c := range r {
+			if c != "" {
+				continue
+			}
+
+			xRow := countSymbolInDirection(x, y, board, "X", Direction{1, 0}, cache) + countSymbolInDirection(x, y, board, "X", Direction{-1, 0}, cache)
+			oRow := countSymbolInDirection(x, y, board, "O", Direction{1, 0}, cache) + countSymbolInDirection(x, y, board, "O", Direction{-1, 0}, cache)
+			xCol := countSymbolInDirection(x, y, board, "X", Direction{0, 1}, cache) + countSymbolInDirection(x, y, board, "X", Direction{0, -1}, cache)
+			oCol := countSymbolInDirection(x, y, board, "O", Direction{0, 1}, cache) + countSymbolInDirection(x, y, board, "O", Direction{0, -1}, cache)
+			xDiag1 := countSymbolInDirection(x, y, board, "X", Direction{1, 1}, cache) + countSymbolInDirection(x, y, board, "X", Direction{-1, -1}, cache)
+			oDiag1 := countSymbolInDirection(x, y, board, "O", Direction{1, 1}, cache) + countSymbolInDirection(x, y, board, "O", Direction{-1, -1}, cache)
+			xDiag2 := countSymbolInDirection(x, y, board, "X", Direction{-1, 1}, cache) + countSymbolInDirection(x, y, board, "X", Direction{1, -1}, cache)
+			oDiag2 := countSymbolInDirection(x, y, board, "O", Direction{-1, 1}, cache) + countSymbolInDirection(x, y, board, "O", Direction{1, -1}, cache)
+
+			if xRow >= 4 || xCol >= 4 || xDiag1 >= 4 || xDiag2 >= 4 {
+				xWinOpt++
+			}
+			if oRow >= 4 || oCol >= 4 || oDiag1 >= 4 || oDiag2 >= 4 {
+				oWinOpt++
+			}
+		}
+	}
+	return xWinOpt > 0 || oWinOpt > 0
 }
 
 // returns true when Difficulty is OK
