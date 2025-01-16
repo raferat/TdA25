@@ -29,7 +29,12 @@ export function translateGameState(gameState: GameState): string {
             return "Neznámý stav";
     }
 }
-
+export function translateDifficultyUnsafe(difficulty: Difficulty | undefined): string | undefined {
+    if (difficulty == undefined) {
+        return undefined
+    }
+    return translateDifficulty(difficulty);
+}
 export function translateDifficulty(difficulty: Difficulty): string {
     switch (difficulty) {
         case "beginner":

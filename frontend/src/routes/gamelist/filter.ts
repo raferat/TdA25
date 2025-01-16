@@ -4,7 +4,7 @@ import '$lib/utils';
 
 export interface Filters {
     nameSearch?: string,
-    difficulty?: Array<Difficulty>,
+    difficulty?: Difficulty,
     gameState?: Array<GameState>,
     sortProperty?: "name" | "created" | "updated" | "difficulty" | "gameState",
     sortDesc?: boolean,
@@ -19,8 +19,8 @@ export const filterList = (list: Game[] | undefined, filter: Filters | undefined
             if (!value.name.normalized().includes(filter.nameSearch.normalized()))
                 return false;
         }
-        if (filter.difficulty && filter.difficulty.length > 0) {
-            if (!filter.difficulty.includes(value.difficulty))
+        if (filter.difficulty) {
+            if (filter.difficulty != value.difficulty)
                 return false;
         }
         return true;
