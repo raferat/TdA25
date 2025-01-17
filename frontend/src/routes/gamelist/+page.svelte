@@ -15,6 +15,7 @@
     let filter: Filters = $state({});
     let filteredList: Game[] | undefined = $state([]);
     let cardlist: HTMLDivElement | undefined = $state();
+    let noGames: boolean = $state(false);
 
     async function loadGameData(gameList: Promise<[Game[], ApiError | undefined]>) {
         const [val, err] = await gameList;
@@ -25,6 +26,10 @@
         }
 
         list = val;
+        if (list == undefined)
+            noGames = true;
+        else
+            noGames = false;
     }
 
     $effect(() => {
@@ -43,10 +48,12 @@
 
 <main>
     <SearchFilterBar bind:filters={filter}/>
-    {#if !filteredList}
+    {#if noGames}
+        <center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Nejsou zatím zveřejněny žádné úlohy</center>
+    {:else if !filteredList}
         <center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Načítání</center>
     {:else if filteredList}
-        <div class="cardlist" bind:this={cardlist}>
+        <div class="cardlist" bind:this={cardlist} in:fade>
             {#each filteredList as elem (elem.uuid)}
                 <div class="gamecard" animate:flip={{duration: 550}} transition:fly={{duration: 250, x: -200}}>
                     <div class="board"><Board value={elem} controls={false}/></div>
