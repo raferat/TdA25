@@ -4,7 +4,7 @@
     import { flip } from "svelte/animate";
     import { filterList, type Filters } from "./filter";
     import SearchFilterBar from "./SearchFilterBar.svelte";
-    import { fade, fly, slide } from "svelte/transition";
+    import { fade, fly } from "svelte/transition";
     import { untrack } from "svelte";
     import { formatDate, shortenText, translateDifficulty, translateGameState } from "$lib/format";
     import Button from "$lib/components/Button.svelte";
@@ -18,6 +18,7 @@
     let noGames: boolean = $state(false);
 
     async function loadGameData(gameList: Promise<[Game[], ApiError | undefined]>) {
+        try {
         const [val, err] = await gameList;
 
         if (err != undefined) {
@@ -26,10 +27,12 @@
         }
 
         list = val;
+        } catch (e) {
         if (list == undefined)
             noGames = true;
         else
             noGames = false;
+        }
     }
 
     $effect(() => {
@@ -49,7 +52,7 @@
 <main>
     <SearchFilterBar bind:filters={filter}/>
     {#if noGames}
-        <center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Nejsou zatím zveřejněny žádné úlohy</center>
+        <center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Zatím nejsou zveřejněny žádné úlohy</center>
     {:else if !filteredList}
         <center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Načítání</center>
     {:else if filteredList}
