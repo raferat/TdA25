@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { createGame, defaultGameBase } from "$lib/api";
+    import Background from "$lib/components/Background.svelte";
     import Board from "$lib/components/Board.svelte";
     import Button from "$lib/components/Button.svelte";
     import Overlay from "$lib/components/Overlay.svelte";
@@ -48,6 +49,7 @@
     };
 </script>
 
+<Background width={0} height={0}/>
 <main>
     <Overlay bind:visible={savingOverlayVisibe}>
         <div class="save-wrapper" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>

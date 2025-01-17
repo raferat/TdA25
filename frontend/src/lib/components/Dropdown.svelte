@@ -56,6 +56,7 @@
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
         padding: 10px;
+        z-index: 999;
     }
 
     .icon {

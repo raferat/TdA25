@@ -72,3 +72,14 @@ export function translateTimeFrameUnsafe(updatedAgo: number | undefined): string
             return "Za 3 Měsíce";
     }
 }
+
+export function shortenText (a: string, length: number): string {
+    if (a.length <= length) return a;
+    const len = length;
+    let result = a.slice(0, len/2);
+    result += "...";
+    result += a.slice(a.length-len/2);
+
+    if (result.length >= a.length) return a;
+    return result;
+}

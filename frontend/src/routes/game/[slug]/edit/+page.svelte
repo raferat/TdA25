@@ -12,6 +12,7 @@
     import RadioButtons from "$lib/components/RadioButtons.svelte";
     import { circOut, sineInOut } from "svelte/easing";
     import { isBoardCorrect } from "$lib/boardutil";
+    import Background from "$lib/components/Background.svelte";
 
     const { data }: { data: { gameData: Promise<[Game, ApiError | undefined]>, slug: string } } =
         $props();
@@ -84,6 +85,7 @@
     })
 </script>
 
+<Background width={0} height={0}/>
 
 {#snippet stats(game: Game)}
 <div class="stats">
