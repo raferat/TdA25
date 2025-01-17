@@ -107,6 +107,10 @@
         width: 100%;
         height: calc(100vh - var(--header-height) - 25px);
         padding: 50px;
+
+        @media screen and (max-width: 550px) {
+            padding: 10px;
+        }
     }
 
     .hero {
@@ -154,6 +158,16 @@
         h2 {
             margin-top: 5px;
             font-size: 20pt;
+        }
+
+        @media screen and (max-width: 1150px) {
+            display: flex;
+            flex-direction: column;
+            font-size: 15pt;
+
+            .board-limiter1, .board-limiter2 {
+                margin: auto;
+            }
         }
     }
 </style>
