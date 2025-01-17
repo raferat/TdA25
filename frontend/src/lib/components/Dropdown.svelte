@@ -20,7 +20,7 @@
 </script>
 
 {#snippet icon()}
-<span class="icon" class:downarrow={!visible} class:uparrow={visible} transition:fade>&af;</span>
+<span class="icon" class:downarrow={!visible} class:uparrow={visible}>&af;</span>
 {/snippet}
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->

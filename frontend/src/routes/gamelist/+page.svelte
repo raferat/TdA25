@@ -5,10 +5,12 @@
     import { filterList, type Filters } from "./filter";
     import SearchFilterBar from "./SearchFilterBar.svelte";
     import { fade, fly, slide } from "svelte/transition";
+    import { untrack } from "svelte";
 
     let list: Game[] | undefined = $state();
     let filter: Filters = $state({});
-    let filteredList: Game[] | undefined = $derived(filterList(list, filter));
+    let filteredList: Game[] | undefined = $state([]);
+    let cardlist: HTMLDivElement | undefined = $state();
 
     async function loadGameData(gameList: Promise<[Game[], ApiError | undefined]>) {
         const [val, err] = await gameList;
@@ -22,6 +24,14 @@
     }
 
     $effect(() => {
+        const flist = filterList(list, filter);
+        
+        untrack(() => {
+            filteredList = flist;
+        });
+    });
+
+    $effect(() => {
         const gameData = listGames(fetch);
         loadGameData(gameData);
     });
@@ -32,7 +42,7 @@
     {#if !filteredList}
         loading
     {:else if filteredList}
-        <div class="cardlist">
+        <div class="cardlist" bind:this={cardlist}>
             {#each filteredList as elem (elem.uuid)}
                 <div class="gamecard" animate:flip={{duration: 550}} transition:fly={{duration: 250, x: -200}}>
                     <div>{elem.name}</div>

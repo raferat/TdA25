@@ -17,6 +17,13 @@ export function formatDate(date: string | Date): string {
     return `${dd}.${MM}.${YY}\xa0\xa0${hh}:${mm}:${ss}`;
 }
 
+export function translateGameStateUnsafe(state: GameState | undefined): string | undefined {
+    if (state == undefined) {
+        return undefined
+    }
+    return translateGameState(state);
+}
+
 export function translateGameState(gameState: GameState): string {
     switch (gameState) {
         case "opening":
@@ -42,10 +49,26 @@ export function translateDifficulty(difficulty: Difficulty): string {
         case "easy":
             return "Jednoduchá";
         case "medium":
-            return "Středně těžká";
+            return "Pokročilá";
         case "hard":
             return "Těžká";
         case "extreme":
-            return "Extrémní";
+            return "Nejtěžší";
+    }
+}
+
+export function translateTimeFrameUnsafe(updatedAgo: number | undefined): string | undefined {
+    if (updatedAgo == undefined)
+        return undefined;
+    
+    switch (updatedAgo) {
+        case 1000*60*60*24:
+            return "Za den";
+        case 1000*60*60*24*7:
+            return "Za týden";
+        case 1000*60*60*24*31:
+            return "Za měsíc";
+        case 1000*60*60*24*31*3:
+            return "Za 3 Měsíce";
     }
 }
