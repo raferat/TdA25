@@ -36,7 +36,7 @@
     async function saveData() {
         loading = true;
         await Promise.all([
-            Promise.after(5000),
+            Promise.after(1000),
             saveGameData(),
         ]);
         loading = false;
@@ -111,8 +111,7 @@
 {/snippet}
 
 {#if loading}
-<div>Loading</div>
-
+    <center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Uloženo!</center>
 {:else if game}
     <main bind:clientWidth={mainClientWidth}>
         <Overlay bind:visible={deleteGameOverlayVisible}>
@@ -161,7 +160,7 @@
         </div>
     </main>
 {:else}
-    Loading
+    <center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Načítání</center>
 {/if}
 
 <style lang="scss">

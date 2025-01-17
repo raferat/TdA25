@@ -108,7 +108,7 @@
         </div>
     </main>
 {:else}
-    Loading
+<center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Uloženo!</center>
 {/if}
 
 <style lang="scss">

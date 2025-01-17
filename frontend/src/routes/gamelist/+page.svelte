@@ -44,7 +44,7 @@
 <main>
     <SearchFilterBar bind:filters={filter}/>
     {#if !filteredList}
-        loading
+        <center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Načítání</center>
     {:else if filteredList}
         <div class="cardlist" bind:this={cardlist}>
             {#each filteredList as elem (elem.uuid)}
