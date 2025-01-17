@@ -99,10 +99,17 @@
         grid-column: 1/4;
         border: 2px solid #0070BB;
         border-radius: 10px;
+        min-width: 500px;
 
         @media screen and (max-width: 680px) {
             grid-column: 1;
+            min-width: 0px;
         }
+    }
+
+    #difficultyDropdown, #gameStateDropdown, #timeDropdown {
+        min-width: 200px;
+        height: 54px;
     }
 
     .dropdownul {
