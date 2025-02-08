@@ -1,21 +1,21 @@
 <script lang="ts">
-    import Background from "$lib/components/Background.svelte";
+    import "../app.css";
     import Header from "$lib/components/Header.svelte";
 
     const { children } = $props();
-
-    let clientWidth: number = $state(0);
-    let clientHeight: number = $state(0);
-
-    let childrenHeight: number = $state(0);
 </script>
 
+<div class="absolute overflow-auto size-full z-0 bg-tcream text-tblack dark:bg-tblack dark:text-tcream">
+    <Header/>
+    {@render children?.()}
+</div>
+<!--
 <div id="outer">
     <div bind:clientWidth={clientWidth} bind:clientHeight={clientHeight}>
         <Header/>
     </div>
     <div id="content" style="height: calc(100vh - {clientHeight}px); --header-height: {clientHeight}px;">
-        <!--<Background height={childrenHeight} width={clientWidth}/>-->
+        <!--<Background height={childrenHeight} width={clientWidth}/>--><!--
         <div bind:clientHeight={childrenHeight}>
             {@render children()}
         </div>
@@ -33,4 +33,4 @@
         overflow: auto;
         position: relative;
     }
-</style>
+</style>-->
