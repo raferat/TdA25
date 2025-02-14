@@ -1,13 +1,17 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @theme {
     --color-tred: oklch(58.49% 0.2265 22.24);
     --color-tblue: oklch(53.28% 0.1441 248.22);
     --color-twhite: oklch(100% 0 0);
 
     --color-tcream: oklch(97.31% 0 0);
-    --color-tlgrey: oklch(21.78% 0 0);
+    --color-tlgrey: oklch(19.78% 0 0);
     --color-tblack: oklch(13.44% 0 0);
+
+    --color-tdark-grid: oklch(50% 0 0);
 
     --color-tberry: oklch(50.49% 0.1632 5);
     --color-tamethyst: oklch(46.15% 0.0993 322.13);

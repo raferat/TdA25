@@ -12,7 +12,7 @@
     </nav>
 </header>
 
-<!-- Random background -->
+<!-- Random background
 {#each [
         [10,100],
         [20,18],
@@ -33,4 +33,4 @@
         [93,95],
     ] as a}
     <img style="top: {a[1]}px; left: {a[0]}%" class="absolute size-10 blur-2xl" src="/icons/X/X_cervene.svg" alt="">
-{/each}
+{/each}-->
