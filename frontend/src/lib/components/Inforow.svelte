@@ -30,10 +30,9 @@
         text = minification(text);
 </script>
 
-<div class="outer">
-    <label for="child">{key}:</label>
-    <div id="child" transition:fade>
-
+<div class="relative w-full p-8 bg-tcream dark:bg-tblack pb-3 rounded-xl overflow-x-auto">
+    <label for="child" class="absolute top-[8px] left-[8px]">{key}:</label>
+    <div id="child" class="max-w-full text-xl font-medium text-nowrap" transition:fade>
         {#if renderer && text}
             {@render renderer(text)}
         {:else if children}
@@ -43,31 +42,4 @@
         {/if}
     </div>
 </div>
-
-<style lang="scss">
-    .outer {
-        width: 100%;
-        position: relative;
-        background-color: #e7e7e7;
-        padding: 25px;
-        padding-bottom: 10px;
-        border-radius: 10px;
-        overflow-x: auto;
-
-        label {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            
-            font-size: 10pt;
-        }
-
-        div {
-            max-width: 100%;
-            font-size: 15pt;
-            text-wrap: nowrap;
-            font-weight: 500;
-        }
-    }
-</style>
 
