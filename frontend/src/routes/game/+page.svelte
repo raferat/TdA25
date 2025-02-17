@@ -2,11 +2,10 @@
     import { goto } from "$app/navigation";
     import { createGame, defaultGameBase } from "$lib/api";
     import Background from "$lib/components/Background.svelte";
-    import Board from "$lib/components/Board.svelte";
-    import Button from "$lib/components/Button.svelte";
     import Overlay from "$lib/components/Overlay.svelte";
     import RadioButtons from "$lib/components/RadioButtons.svelte";
     import TextInput from "$lib/components/TextInput.svelte";
+    import TicTacToe from "$lib/components/TicTacToe.svelte";
     import { circOut, sineInOut } from "svelte/easing";
     import { fade, fly, scale, slide } from "svelte/transition";
 
@@ -23,9 +22,7 @@
 
     const newGame = () => {
         base = defaultGameBase();
-        if (playing) {
-            boardAnimationController = (boardAnimationController + 1) % 5;
-        }
+        boardAnimationController = (boardAnimationController + 1) % 5;
         playing = true;
     };
 
@@ -50,10 +47,10 @@
 </script>
 
 <Background width={0} height={0}/>
-<main>
+<main class="relative size-full overflow-hidden">
     <Overlay bind:visible={savingOverlayVisibe}>
-        <div class="save-wrapper" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>
-            <h2>Uložit hru:</h2>
+        <div class="bg-white dark:bg-tblack text-xl p-8 flex flex-col gap-3 rounded-xl" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>
+            <h2 class="leading-none">Uložit hru:</h2>
             <TextInput bind:value={base.name} placeholder="Jméno" />
             <div>Obtížnost:</div>
             <RadioButtons
@@ -65,37 +62,30 @@
                     { display: "Těžká", option: "hard" },
                     { display: "Extrémní", option: "extreme" },
                 ]}/>
-            <div class="save-options">
-                <Button scaleDown={true} onclick={cancelSave}>
-                    <div class="font-14pt">Zrušit</div>
-                </Button>
-                <Button scaleDown={true} variant="blue" onclick={confirmSave}>
-                    <div class="font-14pt">Uložit</div>
-                </Button>
+            <div class="grid grid-cols-2 gap-1 h-8">
+                <button class="pbred px-2 py-1" onclick={cancelSave}>Zrušit</button>
+                <button class="pbblue px-2 py-1" onclick={confirmSave}>Uložit</button>
             </div>
         </div>
     </Overlay>
 
-    <div class="game">
-        <div></div>
-
-        <div class="board-wrapper">
-            {#key boardAnimationController}
-                <div in:scale={{ delay: 250 }} out:fly={{ y: 500, duration: 250 }}>
-                    <Board {onwin} bind:value={base} />
-                </div>
-            {/key}
+    <div class="size-full md:grid md:grid-cols-[minmax(0,0.7fr)_0.3fr] flex flex-col">
+        {#key boardAnimationController}
+        <div class="size-full" in:scale={{ delay: 250 }} out:scale={{duration: 250}}>
+            <TicTacToe {onwin} bind:board={base.board} />
         </div>
+        {/key}
 
-        <div class="controls">
+        <div class="grid grid-cols-2 p-3 md:flex md:flex-col md:items-end md:justify-end md:gap-4">
             {#if playing}
-                <div transition:slide={{ axis: "x", duration: 250 }}>
-                    <Button variant="blue" onclick={saveGame}>Uložit</Button>
-                </div>
+                <button 
+                    class="pbblue w-full text-xl" 
+                    onclick={saveGame}
+                    transition:slide={{ axis: "x", duration: 250 }}>Uložit</button>
             {:else}
                 <div></div>
             {/if}
-            <Button onclick={newGame}>
+            <button class="pbred w-full text-xl" onclick={newGame}>
                 <div transition:fade>
                     {#if playing}
                         Zahodit
@@ -103,100 +93,7 @@
                         Nová hra
                     {/if}
                 </div>
-            </Button>
+            </button>
         </div>
     </div>
 </main>
-
-<style lang="scss">
-    main {
-        position: relative;
-    }
-
-    .font-14pt {
-        font-size: 14pt;
-        @media screen and (max-width: 1022px) {
-            font-size: 12pt;
-        }
-    }
-    
-
-    .save-wrapper {
-        font-size: 16pt;
-        max-width: 500px;
-        max-height: 500px;
-        background-color: white;
-        box-shadow: 2px 2px 20px #666;
-        border-radius: 5px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-
-        h2 {
-            line-height: 0;
-        }
-
-        .save-options {
-            display: grid;
-            gap: 20px;
-
-            grid-template-columns: 1fr 1fr;
-            height: 40px;
-            width: 300px;
-        }
-    }
-
-    .game {
-        display: grid;
-        grid-template-columns: 0.3fr 0.8fr 0.3fr;
-
-        width: 100dvw;
-        height: calc(100dvh - var(--header-height));
-
-        --button-bar-height: 0px;
-        --padding: 50px;
-        padding: 50px;
-
-        @media screen and (max-width: 1284px) and (min-width: 1022px) {
-            grid-template-columns: 0fr 0.8fr 0.3fr;
-        }
-
-        @media screen and (max-width: 1022px) {
-            display: flex;
-            flex-direction: column;
-
-            padding: 20px;
-            --padding: 20px;
-            --button-bar-height: 80px;
-        }
-
-
-        
-    }
-
-    .board-wrapper {
-        overflow: hidden;
-        height: calc(100dvh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
-
-        & > div {
-            height: calc(100dvh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
-            margin: auto;
-        }
-    }
-
-    .controls {
-        display: flex;
-        flex-direction: column;
-        justify-content: end;
-        align-items: end;
-        gap: 20px;
-
-        @media screen and (max-width: 1022px) {
-            padding-top: 20px;
-            flex-direction: row-reverse;
-
-            justify-content: space-between;
-        }
-    }
-</style>

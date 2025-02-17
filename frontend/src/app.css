@@ -17,3 +17,27 @@
     --color-tamethyst: oklch(46.15% 0.0993 322.13);
     --color-tocean: oklch(47.49% 0.1108 262.38);
 }
+
+@layer components {
+    .pbred {
+        background-color: var(--color-tred);
+        border-radius: 10px;
+        padding: 20px 60px;
+        cursor: pointer;
+
+        &:hover {
+            filter: brightness(80%);
+        }
+    }
+
+    .pbblue {
+        background-color: var(--color-tblue);
+        border-radius: 10px;
+        padding: 20px 60px;
+        cursor: pointer;
+
+        &:hover {
+            filter: brightness(80%);
+        }
+    }
+}
