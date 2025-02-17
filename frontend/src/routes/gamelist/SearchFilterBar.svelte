@@ -13,9 +13,9 @@
     filters.nameSearch = "";
 </script>
 
-<div id="outer">
-    <div id="nameSearch"><TextInput focuseffect={false} placeholder="Hledaný výraz" bind:value={filters.nameSearch}/></div>
-    <div id="difficultyDropdown">
+<div class="grid grid-cols-1 sm:grid-cols-3 xl:flex xl:justify-center xl:items-center w-full gap-3 text-xs p-3">
+    <div class="border-2 border-tblue rounded-xl xl:min-w-[500px] sm:col-[1/4] col-1"><TextInput focuseffect={false} placeholder="Hledaný výraz" bind:value={filters.nameSearch}/></div>
+    <div class="min-w-[200px] h-[54px]">
         <Dropdown>
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -34,7 +34,7 @@
             {/snippet}
         </Dropdown>
     </div>
-    <div id="gameStateDropdown">
+    <div class="min-w-[200px] h-[54px]">
         <Dropdown>
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -51,7 +51,7 @@
             {/snippet}
         </Dropdown>
     </div>
-    <div id="timeDropdown">
+    <div class="min-w-[200px] h-[54px]">
         <Dropdown>
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -72,46 +72,6 @@
 </div>
 
 <style lang="scss">
-    #outer {
-        //position: sticky;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        width: 100%;
-        top: 0;
-        font-size: 13pt;
-
-        @media screen and (max-width: 1260px) and (min-width: 680px) {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            padding: 20px;
-        }
-
-        @media screen and (max-width: 680px) {
-            display: grid;
-            grid-template-columns: 1fr;
-            padding: 10px;
-        }
-    }
-
-    #nameSearch {
-        grid-column: 1/4;
-        border: 2px solid #0070BB;
-        border-radius: 10px;
-        min-width: 500px;
-
-        @media screen and (max-width: 680px) {
-            grid-column: 1;
-            min-width: 0px;
-        }
-    }
-
-    #difficultyDropdown, #gameStateDropdown, #timeDropdown {
-        min-width: 200px;
-        height: 54px;
-    }
-
     .dropdownul {
         margin: 0;
         padding: 0;
