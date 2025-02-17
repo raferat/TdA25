@@ -35,7 +35,7 @@
                 setTimeout(() => {
                     const a = nextSymbol;
                     onwin(a); 
-                }, 2000);
+                }, 500);
             }
 
             board[y][x] = nextSymbol;

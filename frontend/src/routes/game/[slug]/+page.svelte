@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { fly } from "svelte/transition";
+    import { fly, slide } from "svelte/transition";
     import { page } from "$app/state";
     import { findGame, type ApiError, type Game } from "$lib/api.js";
-    import Button from "$lib/components/Button.svelte";
     import Inforow from "$lib/components/Inforow.svelte";
     import { goto } from "$app/navigation";
     import { formatDate, translateDifficulty, translateGameState } from "$lib/format";
@@ -90,17 +89,21 @@
                 </div>
             {/if}
             <div class="grid grid-cols-2 gap-2 w-full">  
-                {#if gameInfoButtonVisible}
+                {#if gameInfoButtonVisible && !winScreenShown }
                     <button class="pbblue text-xl" onclick={toggleInfoOverlay}>Info</button>
                 {:else}
                     <div></div>
                 {/if}
-                <button class="pbred text-xl" onclick={() => goto("./edit")}>Upravit</button>
+                {#if winScreenShown}
+                    <button class="pbred text-xl" onclick={() => goto("/gamelist/")}>Zpět na seznam úloh</button>
+                {:else}
+                    <button class="pbred text-xl" onclick={() => goto("./edit")}>Upravit</button>
+                {/if}
             </div>
         </div>
     </main>
 {:else}
-<center class="text-3xl font-bold mt-20">Uloženo!</center>
+<center class="text-3xl font-bold pt-20">Načítání</center>
 {/if}
 
 <style lang="scss">
