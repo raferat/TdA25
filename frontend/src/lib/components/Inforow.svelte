@@ -30,8 +30,8 @@
         text = minification(text);
 </script>
 
-<div class="relative w-full p-8 bg-tcream dark:bg-tblack pb-3 rounded-xl overflow-x-auto">
-    <label for="child" class="absolute top-[8px] left-[8px]">{key}:</label>
+<div class="relative w-full p-8 bg-tcream2 dark:bg-tblack pb-3 rounded-xl overflow-x-auto">
+    <label for="child" class="absolute top-[8px] left-[8px] text-sm">{key}:</label>
     <div id="child" class="max-w-full text-xl font-medium text-nowrap" transition:fade>
         {#if renderer && text}
             {@render renderer(text)}

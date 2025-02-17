@@ -1,6 +1,5 @@
 <script lang="ts">
-    import Board from "$lib/components/Board.svelte";
-    import { blur, fly } from "svelte/transition";
+    import { fly } from "svelte/transition";
     import { page } from "$app/state";
     import { findGame, type ApiError, type Game } from "$lib/api.js";
     import Button from "$lib/components/Button.svelte";
@@ -9,12 +8,13 @@
     import { formatDate, translateDifficulty, translateGameState } from "$lib/format";
     import Overlay from "$lib/components/Overlay.svelte";
     import { circOut, sineInOut } from "svelte/easing";
+    import TicTacToe from "$lib/components/TicTacToe.svelte";
 
     const { data }: { data: { slug: string } } = $props();
 
     let game: Game | undefined = $state(undefined);
     let mainClientWidth: number = $state(0);
-    let gameInfoButtonVisible: boolean = $derived(mainClientWidth <= 1022);
+    let gameInfoButtonVisible: boolean = $derived(mainClientWidth <= 1024);
     let gameInfoOverlayVisible: boolean = $state(false);
     let winSymbol: "X" | "O" = $state("X");
 
@@ -54,7 +54,7 @@
 
 
 {#snippet stats(game: Game)}
-<div class="stats">
+<div class="grid grid-cols-1 auto-rows-fr gap-2">
     <Inforow key="Jméno hry" text={game.name} />
     <Inforow key="Obtížnost" text={translateDifficulty(game.difficulty)} />
     <Inforow key="Stav hry" text={translateGameState(game.gameState)} />
@@ -72,139 +72,38 @@
 
 
 {#if game}
-    <main bind:clientWidth={mainClientWidth}>
+    <main class="relative size-full grid lg:grid-cols-[minmax(0,0.7fr)_minmax(0,0.3fr)] p-2 grid-cols-1" bind:clientWidth={mainClientWidth}>
         <Overlay bind:visible={gameInfoOverlayVisible}>
-            <div class="info-wrapper" in:fly={{ y: -500, easing: circOut }} out:fly={{ y: -500, easing: sineInOut }}>
+            <div class="p-4 bg-twhite dark:bg-tlgrey rounded-xl flex flex-col gap-3" 
+                in:fly={{ y: -500, easing: circOut }} 
+                out:fly={{ y: -500, easing: sineInOut }}>
                 {@render stats(game)}
             </div>
         </Overlay>
-        <div class="game">
-            <div class="board-wrapper">
-                <div class:afterwin={winScreenShown} transition:blur>
-                    <Board {onwin} bind:value={game} />
-                    {#if winScreenShown}
-                        <Button href="/gamelist/" variant={winSymbol == "X" ? "red" : "blue"} scaleDown={true}>
-                            <div class="font-15pt" style="padding: 12px 40px 12px 20px; display: flex; gap: 12px">
-                                <span class="back-arrow"></span>
-                                Zpět na seznam úloh
-                            </div>
-                        </Button>
-                    {/if}
+        
+        <TicTacToe bind:board={game.board} {onwin}/>
+        
+        <div class="flex flex-col gap-1 lg:justify-between justify-end">
+            {#if !gameInfoButtonVisible}
+                <div class="bg-tlgrey rounded-xl p-4 mt-3">
+                {@render stats(game)}
                 </div>
-            </div>
-            <div class="sidebar">
-                {#if !gameInfoButtonVisible}
-                    {@render stats(game)}
+            {/if}
+            <div class="grid grid-cols-2 gap-2 w-full">  
+                {#if gameInfoButtonVisible}
+                    <button class="pbblue text-xl" onclick={toggleInfoOverlay}>Info</button>
+                {:else}
+                    <div></div>
                 {/if}
-                <div class="controls">  
-                    {#if gameInfoButtonVisible}
-                        <Button variant="blue" scaleDown={true} onclick={toggleInfoOverlay}><div class="font-15pt">Info</div></Button>
-                    {:else}
-                        <div></div>
-                    {/if}
-                    <Button href="./edit" scaleDown={true}><div class="font-15pt">Upravit</div></Button>
-                </div>
+                <button class="pbred text-xl" onclick={() => goto("./edit")}>Upravit</button>
             </div>
         </div>
     </main>
 {:else}
-<center style="font-size:20pt; font-weight: 600; margin-top: 150px;">Uloženo!</center>
+<center class="text-3xl font-bold mt-20">Uloženo!</center>
 {/if}
 
 <style lang="scss">
-    main {
-        position: relative;
-    }
-
-    .font-15pt {
-        font-size: 15pt;
-        padding: 20px;
-
-        @media screen and (max-width: 1022px) {
-            font-size: 13pt;
-            padding: 12px;
-        }
-    }
-
-    .game {
-        display: grid;
-        grid-template-columns: 0.8fr 0.3fr;
-        gap: 20px;
-
-        width: 100dvw;
-        height: calc(100dvh - var(--header-height));
-        --button-bar-height: 0px;
-        --padding: 50px;
-        padding: 50px;
-
-        @media screen and (max-width: 1022px) {
-            display: flex;
-            flex-direction: column;
-
-            padding: 20px;
-            --padding: 20px;
-            --button-bar-height: 68px;
-        }
-    }
-
-    .board-wrapper {
-        overflow: hidden;
-        height: calc(100dvh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
-
-        padding-top: 0;
-        transition: all 250ms ease-in-out;
-        transition-delay: 250ms;
-
-        & > div {
-            height: calc(100dvh - var(--header-height) - 2 * var(--padding) - var(--button-bar-height));
-            margin: auto;
-        }
-
-        .afterwin {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 175px;
-        }
-    }
-
-    .info-wrapper {
-        font-size: 16pt;
-        max-width: 500px;
-        background-color: white;
-        box-shadow: 2px 2px 20px #666;
-        border-radius: 5px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-    }
-
-    .sidebar {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-
-        gap: 20px;
-    }
-
-    .stats {
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-auto-rows: 1fr;
-        gap: 20px;
-        width: 100%;
-        height: min-content;
-    }
-
-    .controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        width: 100%;
-        gap: 20px;
-        justify-content: space-between;
-    }
-
     .copy-icon {
         position: absolute;
         right: 10px;
@@ -233,14 +132,5 @@
             background-color: #00000020;
             
         }
-    }
-
-    .back-arrow {
-        background: url("/material-icons/arrow-back/48x48-white.svg");
-        background-size: 19px 19px;
-        background-position: center;
-        width: 22px;
-        height: 22px;
-        display: inline-block;
     }
 </style>
