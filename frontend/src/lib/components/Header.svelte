@@ -2,7 +2,6 @@
     import Overlay from "./Overlay.svelte";
 
     let overlayVisible = $state(false);
-
 </script>
 <header class="w-screen p-7 flex justify-between">
     <a href="/" aria-label="Logo link pointing about page">

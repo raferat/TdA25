@@ -59,7 +59,7 @@
 <Background width={0} height={0}/>
 
 <main>
-    <center class="hero">
+    <center>
         <h1>Jsme
             <div class="big-icon"></div>
         </h1>
@@ -113,9 +113,6 @@
         }
     }
 
-    .hero {
-        background-color: #F6F6F6;
-    }
     .big-icon {
         width: 300px;
         height: 300px;
