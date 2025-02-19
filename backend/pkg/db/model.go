@@ -124,7 +124,7 @@ type User struct {
 	UserBase
 
 	Uuid      string `json:"uuid"`
-	CreatedAt MyTime `json:"created_at"`
+	CreatedAt MyTime `json:"createdAt"`
 	Wins      int    `json:"wins"`
 	Draws     int    `json:"draws"`
 	Losses    int    `json:"losses"`
