@@ -1,7 +1,7 @@
 <script lang="ts">
     import { fly, slide } from "svelte/transition";
     import { page } from "$app/state";
-    import { findGame, type ApiError, type Game } from "$lib/api.js";
+    import { findGame, type ApiError, type Game } from "$lib/api";
     import Inforow from "$lib/components/Inforow.svelte";
     import { goto } from "$app/navigation";
     import { formatDate, translateDifficulty, translateGameState } from "$lib/format";

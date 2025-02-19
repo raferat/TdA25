@@ -14,7 +14,7 @@
 </script>
 
 <div class="grid grid-cols-1 sm:grid-cols-3 xl:flex xl:justify-center xl:items-center w-full gap-3 text-xs p-3">
-    <div class="border-2 border-tblue rounded-xl xl:min-w-[500px] sm:col-[1/4] col-1"><TextInput focuseffect={false} placeholder="Hledaný výraz" bind:value={filters.nameSearch}/></div>
+    <div class="rounded-xl xl:min-w-[500px] sm:col-[1/4] col-1"><TextInput placeholder="Hledaný výraz" bind:value={filters.nameSearch}/></div>
     <div class="min-w-[200px] h-[54px]">
         <Dropdown>
             <!-- svelte-ignore a11y_click_events_have_key_events -->

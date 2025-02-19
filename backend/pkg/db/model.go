@@ -112,3 +112,83 @@ func convertAnyTo2DSlice[T any](a any) (result [][]T, err error) {
 
 	return result, nil
 }
+
+type UserBase struct {
+	Username string `json:"username"`
+	Password string `json:"-"`
+	Elo      int    `json:"elo"`
+	Email    string `json:"email"`
+}
+
+type User struct {
+	UserBase
+
+	Uuid      string `json:"uuid"`
+	CreatedAt MyTime `json:"created_at"`
+	Wins      int    `json:"wins"`
+	Draws     int    `json:"draws"`
+	Losses    int    `json:"losses"`
+	Banned    bool   `json:"-"`
+}
+
+func (b *UserBase) UnmarshalJSON(arr []byte) error {
+	dst := make(map[string]any)
+	err := json.Unmarshal(arr, &dst)
+	if err != nil {
+		return errors.New("Invalid JSON object")
+	}
+
+	if val, ok := dst["username"]; ok {
+		b.Username, ok = val.(string)
+		if !ok {
+			return errors.New("JSON 'username' field is not string")
+		}
+	} else {
+		return errors.New("JSON has no 'username' field")
+	}
+
+	if val, ok := dst["password"]; ok {
+		b.Password, ok = val.(string)
+		if !ok {
+			return errors.New("JSON 'password' field is not string")
+		}
+	} else {
+		return errors.New("JSON has no 'password' field")
+	}
+
+	if val, ok := dst["email"]; ok {
+		b.Email, ok = val.(string)
+		if !ok {
+			return errors.New("JSON 'email' field is not string")
+		}
+	} else {
+		return errors.New("JSON has no 'email' field")
+	}
+
+	if val, ok := dst["elo"]; ok {
+		elo, ok := val.(float64)
+		b.Elo = int(elo)
+		if !ok {
+			return errors.New("JSON 'elo' field is not int")
+		}
+	} else {
+		return errors.New("JSON has no 'elo' field")
+	}
+
+	delete(dst, "username")
+	delete(dst, "password")
+	delete(dst, "elo")
+	delete(dst, "email")
+
+	if len(dst) == 0 {
+		return nil
+	}
+
+	names := bytes.NewBufferString("Sent JSON object has too many attributes:")
+
+	for i := range dst {
+		names.WriteString(" '" + i + "'" + ",")
+	}
+
+	return errors.New(names.String())
+}

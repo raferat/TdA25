@@ -1,6 +1,11 @@
 <script>
+    import { initLoginState, loginState } from "$lib/api";
     import Overlay from "./Overlay.svelte";
 
+    $effect(() => {
+        initLoginState();
+    })
+    
     let overlayVisible = $state(false);
 </script>
 <header class="w-screen p-7 flex justify-between">
@@ -25,8 +30,12 @@
             <a href="/">Úvod</a>
             <a href="/game/">Hrát</a>
             <a href="/gamelist/">Úlohy</a>
-            <a href="/login/">Přihlášení</a>
-            <a href="/register/">Registrace</a>
+            {#if $loginState}
+                <button class="pbred">Odhlásit ({$loginState.username}: {$loginState.elo})</button>
+            {:else}
+                <a href="/login/">Přihlášení</a>
+                <a href="/register/">Registrace</a>
+            {/if}
         </nav>
     </Overlay>
 </header>

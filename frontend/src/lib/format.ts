@@ -1,4 +1,4 @@
-import type { Difficulty, GameState } from "./api";
+import type { Difficulty, GameState } from "./api.ts";
 
 export function formatDate(date: string | Date): string {
     if (typeof date === "string") {

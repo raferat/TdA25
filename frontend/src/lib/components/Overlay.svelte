@@ -19,7 +19,7 @@
 {#if visible}
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="overlay" onclick={hide} transition:fade>
+<div class="overlay backdrop-brightness-90 dark:backdrop-brightness-50 backdrop-blur-sm z-50 absolute top-0 left-0 size-full flex justify-center items-center" onclick={hide} transition:fade>
     <div onclick={e => e.stopPropagation()}>
         {@render children?.()}
     </div>
@@ -27,17 +27,5 @@
 {/if}
 
 <style lang="scss">
-    .overlay {
-        position: absolute;
-        z-index: 50;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(5px);
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    
 </style>

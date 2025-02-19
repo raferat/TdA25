@@ -26,6 +26,21 @@ var (
 
 	// DELETE FROM games WHERE uuid=?
 	deleteGame *sql.Stmt
+
+	// INSERT INTO users (uuid, created_at, username, email, password, elo, wins, draws, losses, banned) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	createUser *sql.Stmt
+
+	// SELECT * FROM users
+	listUsers *sql.Stmt
+
+	// SELECT * FROM users WHERE uuid=?
+	findUser *sql.Stmt
+
+	// UPDATE users SET username=?, email=?, password=?, elo=? WHERE uuid=? RETURNING created_at, wins, draws, losses, banned
+	editUser *sql.Stmt
+
+	// DELETE FROM users WHERE uuid=?
+	deleteUser *sql.Stmt
 )
 
 //go:embed initdb.sql
@@ -104,6 +119,31 @@ func prepareQueries(db *sql.DB) (err error) {
 		return err
 	}
 
+	createUser, err = db.Prepare("INSERT INTO users (uuid, created_at, username, email, password, elo, wins, draws, losses, banned) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	if err != nil {
+		return err
+	}
+
+	listUsers, err = db.Prepare("SELECT * FROM users")
+	if err != nil {
+		return err
+	}
+
+	findUser, err = db.Prepare("SELECT * FROM users WHERE uuid=?")
+	if err != nil {
+		return err
+	}
+
+	editUser, err = db.Prepare("UPDATE users SET username=?, email=?, password=?, elo=? WHERE uuid=? RETURNING created_at, wins, draws, losses, banned")
+	if err != nil {
+		return err
+	}
+
+	deleteUser, err = db.Prepare("DELETE FROM users WHERE uuid=?")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -119,4 +159,14 @@ func closeQueries() {
 	utils.LogIfErrNotNil("Closing editGame query", err)
 	err = deleteGame.Close()
 	utils.LogIfErrNotNil("Closing deleteGame query", err)
+	err = createUser.Close()
+	utils.LogIfErrNotNil("Closing createUser query", err)
+	err = listUsers.Close()
+	utils.LogIfErrNotNil("Closing listUsers query", err)
+	err = findUser.Close()
+	utils.LogIfErrNotNil("Closing findUser query", err)
+	err = editUser.Close()
+	utils.LogIfErrNotNil("Closing editUser query", err)
+	err = deleteUser.Close()
+	utils.LogIfErrNotNil("Closing deleteUser query", err)
 }

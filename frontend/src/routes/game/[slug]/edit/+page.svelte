@@ -1,7 +1,7 @@
 <script lang="ts">
     import Board from "$lib/components/Board.svelte";
     import { blur, fly } from "svelte/transition";
-    import { deleteGame, updateGame, type ApiError, type Game } from "$lib/api.js";
+    import { deleteGame, updateGame, type ApiError, type Game } from "$lib/api";
     import "$lib/utils";
     import Button from "$lib/components/Button.svelte";
     import Inforow from "$lib/components/Inforow.svelte";

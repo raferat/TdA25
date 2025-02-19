@@ -1,4 +1,4 @@
-import { findGame } from '$lib/api.js';
+import { findGame } from '$lib/api';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ params, fetch }) => {

@@ -43,6 +43,14 @@ func registerApiRoutes() http.Handler {
 
 	mux.Handle("DELETE /v1/games/{uuid}", utils.JSONEncodeMiddleware(api.DeleteGame))
 
+	//================== USERS ===================
+
+	mux.Handle("POST /v1/users", utils.JSONEncodeMiddleware(api.ParseUserMiddleware(api.CreateUser)))
+	mux.Handle("GET /v1/users", utils.JSONEncodeMiddleware(api.ListUsers))
+	mux.Handle("GET /v1/users/{uuid}", utils.JSONEncodeMiddleware(api.FindUser))
+	mux.Handle("PUT /v1/users/{uuid}", utils.JSONEncodeMiddleware(api.ParseUserMiddleware(api.UpdateUser)))
+	mux.Handle("DELETE /v1/users/{uuid}", utils.JSONEncodeMiddleware(api.DeleteUser))
+
 	return mux
 }
 
