@@ -16,7 +16,11 @@
     let ws: WebSocket;
 
     function startGame() {
-        ws = new WebSocket(`ws://${window.location.host}/realtime/freeplay`);
+        try {
+            ws = new WebSocket(`wss://${window.location.host}/realtime/freeplay`);
+        } catch (e) {
+            ws = new WebSocket(`ws://${window.location.host}/realtime/freeplay`);
+        }
         ws.onopen = () => {
             ws.send("create " + selectedSymbol);
         }

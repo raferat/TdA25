@@ -1,5 +1,6 @@
 <script lang="ts">
     import { calculateNextSymbol } from '$lib/boardutil';
+    import Background from '$lib/components/Background.svelte';
     import Overlay from '$lib/components/Overlay.svelte';
     import TicTacToe from '$lib/components/TicTacToe.svelte';
     import { untrack } from 'svelte';
@@ -18,7 +19,12 @@
     let badConnection: boolean = $state(false);
 
     function connectToGame() {
-        ws = new WebSocket(`ws://${window.location.host}/realtime/freeplay`);
+        if (window.location.host.endsWith(".app")) {
+            ws = new WebSocket(`wss://${window.location.host}/realtime/freeplay`);
+        } else {
+            ws = new WebSocket(`ws://${window.location.host}/realtime/freeplay`);
+        }
+        
         ws.onopen = () => {
             ws.send("connect " + data.slug);
         }
