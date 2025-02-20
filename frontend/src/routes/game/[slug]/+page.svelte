@@ -84,7 +84,7 @@
         
         <div class="flex flex-col gap-1 lg:justify-between justify-end">
             {#if !gameInfoButtonVisible}
-                <div class="bg-tlgrey rounded-xl p-4 mt-3">
+                <div class="dark:bg-tlgrey rounded-xl p-4 mt-3">
                 {@render stats(game)}
                 </div>
             {/if}

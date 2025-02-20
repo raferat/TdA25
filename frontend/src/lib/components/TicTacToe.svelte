@@ -7,10 +7,12 @@
         board = $bindable(),
         playing = true,
         onwin = (symbol: "X" | "O") => {},
+        placedSymbol = () => {},
     }: { 
         board: Board,
         playing?: boolean,
         onwin?: (symbol: "X" | "O") => void;
+        placedSymbol?: (x:number, y:number, symbol: "X" | "O") => void,
     } = $props();
 
 
@@ -26,6 +28,7 @@
         }
         return () => {
             if (board[y][x] != "" ) return;
+            placedSymbol(x, y, nextSymbol);
 
             if (isWinMove(board, x, y, nextSymbol)) {
                 playing = false;
