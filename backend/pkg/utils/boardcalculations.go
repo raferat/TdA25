@@ -45,6 +45,27 @@ func countSymbolInDirection(startX, startY int, board [][]string, symbol string,
 	return cnt
 }
 
+func IsGameFinished(board [][]string) bool {
+	cache := make(map[cachePos]int)
+	for y, r := range board {
+		for x, c := range r {
+			if c == "" {
+				continue
+			}
+
+			row := countSymbolInDirection(x, y, board, c, Direction{1, 0}, cache) + countSymbolInDirection(x, y, board, c, Direction{-1, 0}, cache) + 1
+			col := countSymbolInDirection(x, y, board, c, Direction{0, 1}, cache) + countSymbolInDirection(x, y, board, c, Direction{0, -1}, cache) + 1
+			diag1 := countSymbolInDirection(x, y, board, c, Direction{1, 1}, cache) + countSymbolInDirection(x, y, board, c, Direction{-1, -1}, cache) + 1
+			diag2 := countSymbolInDirection(x, y, board, c, Direction{-1, 1}, cache) + countSymbolInDirection(x, y, board, c, Direction{1, -1}, cache) + 1
+
+			if row >= 5 || col >= 5 || diag1 >= 5 || diag2 >= 5 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func CanWinInNextTurn(board [][]string, x, o int) bool {
 	type pos struct {
 		x int

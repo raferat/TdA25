@@ -9,7 +9,7 @@
         const darkTheme = (themePreference === "dark" || 
                           (themePreference === null && window.matchMedia("(prefers-color-scheme: dark)").matches));
         if (darkTheme) {
-            document.documentElement.setAttribute("data-theme", "dark")
+            document.documentElement.setAttribute("data-theme", "light")
         } else {
             document.documentElement.setAttribute("data-theme", "light")
         }

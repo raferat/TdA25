@@ -109,3 +109,14 @@ func DeleteUser(uuid string) bool {
 
 	return num == 1
 }
+
+func LoginUser(credential string, password string) *User {
+	res := loginUser.QueryRow(credential, password, credential, password)
+	user, err := scanUserFromRow(res)
+	if err != nil {
+		log.Printf("Error logging in user: %#v\n", err)
+		return nil
+	}
+
+	return user
+}

@@ -1,5 +1,4 @@
-import { untrack } from "svelte";
-import { writable, type Writable } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 
 export type Board = ("X" | "O" | "")[][];
 export type Difficulty = "beginner" | "easy" | "medium" | "hard" | "extreme";
@@ -116,7 +115,7 @@ export async function updateGame(base: GameBase, uuid: string, fetchFunc=fetch):
 //================================== Users API ==========================================
 
 export type LoginUser =
-    | { username: string; email: string; elo: string; token: string }
+    | { username: string; email: string; elo: number; token: string, isAdmin: boolean }
     | undefined;
 
 export const loginState: Writable<LoginUser> = writable();
@@ -136,6 +135,20 @@ export function initLoginState() {
 
         window.localStorage.setItem("user", JSON.stringify(value));
     });
+
+    window.addEventListener("storage", () => {
+        const loaded = loadLoginState();
+        if (loaded == get(loginState)) return;
+        
+        loginState.set(loaded);
+    });
+
+    window.addEventListener("userLoginChange", () => {
+        const loaded = loadLoginState();
+        if (loaded == get(loginState)) return;
+        
+        loginState.set(loaded);
+    });
 }
 
 function loadLoginState(): LoginUser {
@@ -146,7 +159,7 @@ function loadLoginState(): LoginUser {
     const userJSON: string | null = window.localStorage.getItem("user");
 
     if (!userJSON || userJSON == null) {
-        
+
         return undefined;
     }
 
@@ -154,9 +167,33 @@ function loadLoginState(): LoginUser {
     return userObj;
 }
 
-export async function login(username: string, password: string) {}
+export async function login(username: string, password: string, fetchFunc=fetch): Promise<LoginUser> {
+    const loginStr = JSON.stringify({
+        username: username,
+        password: password,
+    });
+
+    const resp = await fetchFunc(`/api/realtime/login`, {
+        method: "POST",
+        body: loginStr,
+    })
+
+    if (!resp.ok) {
+        return undefined;
+    }
+
+    const rawJWT = await resp.text();
+    
+    const payload = JSON.parse(atob(rawJWT.split(".")[1]));
+
+    const tmp = {username: payload["username"], email: payload["email"], elo: payload["elo"], token: rawJWT, isAdmin: payload["isAdmin"]};
+    loginState.set(tmp);
+    window.dispatchEvent(new Event("userLoginChange"));
+    return tmp;
+}
 
 export async function logout() {
     loginState.set(undefined);
+    window.dispatchEvent(new Event("userLoginChange"));
 }
 

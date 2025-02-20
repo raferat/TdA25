@@ -12,13 +12,14 @@ import (
 )
 
 func router(mux *http.ServeMux) http.Handler {
-	mux.Handle("GET /api", utils.JSONEncodeMiddleware(func(r *http.Request) (int, any) {
+	mux.Handle("/realtime/freeplay", http.HandlerFunc(api.HandleFreeplayGame))
+	mux.Handle("GET /api", utils.LoggingMiddleware(utils.CompressionMiddleware(utils.JSONEncodeMiddleware(func(r *http.Request) (int, any) {
 		return http.StatusOK, map[string]string{"organization": "Student Cyber Games"}
-	}))
-	mux.Handle("/api/", http.StripPrefix("/api", registerApiRoutes()))
-	mux.Handle("/", fileRouter("./website", "fallback.html"))
+	}))))
+	mux.Handle("/api/", utils.LoggingMiddleware(utils.CompressionMiddleware(http.StripPrefix("/api", registerApiRoutes()))))
+	mux.Handle("/", utils.LoggingMiddleware(utils.CompressionMiddleware(fileRouter("./website", "fallback.html"))))
 
-	return utils.LoggingMiddleware(utils.CompressionMiddleware(mux))
+	return mux
 }
 
 func registerApiRoutes() http.Handler {
@@ -50,6 +51,11 @@ func registerApiRoutes() http.Handler {
 	mux.Handle("GET /v1/users/{uuid}", utils.JSONEncodeMiddleware(api.FindUser))
 	mux.Handle("PUT /v1/users/{uuid}", utils.JSONEncodeMiddleware(api.ParseUserMiddleware(api.UpdateUser)))
 	mux.Handle("DELETE /v1/users/{uuid}", utils.JSONEncodeMiddleware(api.DeleteUser))
+
+	//================== REALTIME ================
+
+	mux.Handle("POST /realtime/login", http.HandlerFunc(api.Login))
+	// mux.Handle("GET /realtime/freeplay", http.HandlerFunc(api.HandleFreeplayGame))
 
 	return mux
 }

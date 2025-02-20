@@ -41,6 +41,9 @@ var (
 
 	// DELETE FROM users WHERE uuid=?
 	deleteUser *sql.Stmt
+
+	// SELECT * FROM users WHERE (username=? AND password=?) OR (email=? AND password=?)
+	loginUser *sql.Stmt
 )
 
 //go:embed initdb.sql
@@ -144,6 +147,11 @@ func prepareQueries(db *sql.DB) (err error) {
 		return err
 	}
 
+	loginUser, err = db.Prepare("SELECT * FROM users WHERE (username=? AND password=?) OR (email=? AND password=?)")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -169,4 +177,6 @@ func closeQueries() {
 	utils.LogIfErrNotNil("Closing editUser query", err)
 	err = deleteUser.Close()
 	utils.LogIfErrNotNil("Closing deleteUser query", err)
+	err = loginUser.Close()
+	utils.LogIfErrNotNil("Closing loginUser query", err)
 }
