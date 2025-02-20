@@ -197,3 +197,25 @@ export async function logout() {
     window.dispatchEvent(new Event("userLoginChange"));
 }
 
+export async function register(username: string, email: string, password: string, fetchFunc=fetch): Promise<boolean> {
+    const resp = await fetchFunc("/api/v1/users", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            username: username,
+            email: email,
+            password: password,
+            elo: 400,
+        }),
+    });
+
+
+    if (resp.ok) {
+        await login(username, password);
+        return true;
+    } else {
+        return false;
+    }
+}
