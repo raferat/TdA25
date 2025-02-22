@@ -2,9 +2,10 @@
     import TicTacToe from "$lib/components/TicTacToe.svelte";
     import {calculateNextSymbol} from "$lib/boardutil";
     import Background from "$lib/components/Background.svelte";
+    import { goto } from "$app/navigation";
     
 
-    let gameState: "pregame" | "waiting" | "started" = $state("pregame");
+    let gameState: "pregame" | "waiting" | "started" | "ended" = $state("pregame");
     let selectedSymbol: "X" | "O" = $state("O");
 
     let board: ("X"|"O"|"")[][] = $state(Array.from({ length: 15 }, () => Array(15).fill("")));
@@ -16,9 +17,9 @@
     let ws: WebSocket;
 
     function startGame() {
-        try {
+        if (window.location.host.endsWith(".app")) {
             ws = new WebSocket(`wss://${window.location.host}/realtime/freeplay`);
-        } catch (e) {
+        } else {
             ws = new WebSocket(`ws://${window.location.host}/realtime/freeplay`);
         }
         ws.onopen = () => {
@@ -43,6 +44,17 @@
                 let x = parseInt(cmd[1]);
                 let y = parseInt(cmd[2]);
                 board[y][x] = "O";
+            } else if (msg == "Xwon") {
+                winSymbol = "X";
+                setTimeout(() => {
+                    gameState = "ended";    
+                }, 1000);
+                
+            } else if (msg == "Owon") {
+                winSymbol = "O";
+                setTimeout(() => {
+                    gameState = "ended";    
+                }, 1000);
             }
         };       
     }
@@ -50,6 +62,8 @@
     function symbolPlaced(x: number, y: number, symbol: "X" | "O") {
         ws.send(`${x} ${y}`);
     }
+
+    let winSymbol: "X" | "O" | undefined = $state();
 </script>
 
 <Background height={0} width={0}/>
@@ -80,6 +94,16 @@
     <div class="size-full" class:overlay={currentTurnSymbol != selectedSymbol}>
         <TicTacToe bind:board={board} placedSymbol={symbolPlaced} />
     </div>
+{:else if gameState == "ended"}
+<div class="w-40 m-auto p-3">
+    <div class="mb-2">Vyhrál symbol</div>
+    {#if winSymbol == "X"}
+        <img class="m-auto w-20" src="/icons/X/X_cervene.svg" alt="">
+    {:else}
+        <img class="m-auto w-20" src="/icons/O/O_modre.svg" alt="">
+    {/if}
+    <button onclick={_ => goto("/play/")} class="pbred w-full mt-2">Zpět</button>
+</div>
 {/if}
 </main>
 

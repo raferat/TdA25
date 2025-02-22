@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { calculateNextSymbol } from '$lib/boardutil';
     import Background from '$lib/components/Background.svelte';
     import Overlay from '$lib/components/Overlay.svelte';
@@ -44,6 +45,17 @@
                 let x = parseInt(cmd[1]);
                 let y = parseInt(cmd[2]);
                 board[y][x] = "O";
+            } else if (msg == "Xwon") {
+                winSymbol = "X";
+                setTimeout(() => {
+                    finished = true;
+                }, 1000);
+                
+            } else if (msg == "Owon") {
+                winSymbol = "O";
+                setTimeout(() => {
+                    finished = true;
+                }, 1000);
             }
         };
     }
@@ -74,11 +86,24 @@
     function symbolPlaced(x: number, y: number, symbol: "X" | "O") {
         ws.send(`${x} ${y}`);
     }
+
+    let finished = $state(false);
+    let winSymbol = $state();
 </script>
 
 <Background height={0} width={0}/>
 {#if data.slug.length != 6 || badConnection}
 <h2 class="text-center text-3xl">Neplatný kód</h2>
+{:else if finished}
+<div class="w-40 m-auto p-3">
+    <div class="mb-2">Vyhrál symbol</div>
+    {#if winSymbol == "X"}
+        <img class="m-auto w-20" src="/icons/X/X_cervene.svg" alt="">
+    {:else}
+        <img class="m-auto w-20" src="/icons/O/O_modre.svg" alt="">
+    {/if}
+    <button onclick={_ => goto("/play/")} class="pbred w-full mt-2">Zpět</button>
+</div>
 {:else if selectedSymbol}
 <main class="size-full" class:overlay={currentTurnSymbol != selectedSymbol}>
     <Overlay bind:visible={overlayVisible}>
