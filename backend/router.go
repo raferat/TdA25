@@ -13,6 +13,7 @@ import (
 
 func router(mux *http.ServeMux) http.Handler {
 	mux.Handle("/realtime/freeplay", http.HandlerFunc(api.HandleFreeplayGame))
+	mux.Handle("/realtime/joinmatch", http.HandlerFunc(api.HandleMatchmakingRequest))
 	mux.Handle("GET /api", utils.LoggingMiddleware(utils.CompressionMiddleware(utils.JSONEncodeMiddleware(func(r *http.Request) (int, any) {
 		return http.StatusOK, map[string]string{"organization": "Student Cyber Games"}
 	}))))
@@ -55,6 +56,7 @@ func registerApiRoutes() http.Handler {
 	//================== REALTIME ================
 
 	mux.Handle("POST /realtime/login", http.HandlerFunc(api.Login))
+	mux.Handle("GET /realtime/refresh", http.HandlerFunc(api.RefreshLogin))
 	// mux.Handle("GET /realtime/freeplay", http.HandlerFunc(api.HandleFreeplayGame))
 
 	return mux

@@ -192,6 +192,31 @@ export async function login(username: string, password: string, fetchFunc=fetch)
     return tmp;
 }
 
+export async function refreshlogin(fetchFunc=fetch) {
+    const token = get(loginState)?.token as string;
+
+    const resp = await fetchFunc(`/api/realtime/refresh`, {
+        method: "GET",
+        headers: {
+            "Auth": token,
+        },
+    })
+
+    if (!resp.ok) {
+        loginState.set(undefined);
+        window.dispatchEvent(new Event("userLoginChange"));
+        return;
+    }
+
+    const rawJWT = await resp.text();
+    
+    const payload = JSON.parse(atob(rawJWT.split(".")[1]));
+
+    const tmp = {username: payload["username"], email: payload["email"], elo: payload["elo"], token: rawJWT, isAdmin: payload["isAdmin"]};
+    loginState.set(tmp);
+    window.dispatchEvent(new Event("userLoginChange"));
+}
+
 export async function logout() {
     loginState.set(undefined);
     window.dispatchEvent(new Event("userLoginChange"));

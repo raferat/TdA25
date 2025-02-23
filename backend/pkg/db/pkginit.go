@@ -44,6 +44,12 @@ var (
 
 	// SELECT * FROM users WHERE (username=? AND password=?) OR (email=? AND password=?)
 	loginUser *sql.Stmt
+
+	// UPDATE users SET elo=?, wins=?, draws=?, losses=? WHERE uuid=?
+	editUserScore *sql.Stmt
+
+	// SELECT * FROM users WHERE username=? OR email=?
+	searchUser *sql.Stmt
 )
 
 //go:embed initdb.sql
@@ -152,6 +158,16 @@ func prepareQueries(db *sql.DB) (err error) {
 		return err
 	}
 
+	editUserScore, err = db.Prepare("UPDATE users SET elo=?, wins=?, draws=?, losses=? WHERE uuid=?")
+	if err != nil {
+		return err
+	}
+
+	searchUser, err = db.Prepare("SELECT * FROM users WHERE username=? OR email=?")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -179,4 +195,6 @@ func closeQueries() {
 	utils.LogIfErrNotNil("Closing deleteUser query", err)
 	err = loginUser.Close()
 	utils.LogIfErrNotNil("Closing loginUser query", err)
+	err = editUserScore.Close()
+	utils.LogIfErrNotNil("Closing editUserScore query", err)
 }

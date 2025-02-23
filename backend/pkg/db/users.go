@@ -79,6 +79,15 @@ func GetUserByUUID(uuid string) *User {
 	return user
 }
 
+func SearchUser(usernameOrEmail string) *User {
+	row := searchUser.QueryRow(usernameOrEmail, usernameOrEmail)
+	user, err := scanUserFromRow(row)
+	if err != nil {
+		return nil
+	}
+	return user
+}
+
 func UpdateUser(uuid string, base *UserBase) *User {
 	user := &User{
 		UserBase: *base,
@@ -119,4 +128,11 @@ func LoginUser(credential string, password string) *User {
 	}
 
 	return user
+}
+
+func EditUserScore(uuid string, elo, wins, draws, losses int) {
+	_, err := editUserScore.Exec(elo, wins, draws, losses, uuid)
+	if err != nil {
+		log.Printf("Error editing user data: %#v\n", err)
+	}
 }

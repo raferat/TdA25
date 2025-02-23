@@ -47,6 +47,6 @@
     </div>
     <div class="border-2 rounded-xl flex flex-col justify-between">
         <h2 class="text-2xl text-center leading-10 font-semibold">Hodnocená hra</h2>
-        <button class="pbblue m-8 text-xl disabled:bg-gray-500" disabled={$loginState == undefined}>Hrát</button>
+        <button class="pbblue m-8 text-xl disabled:bg-gray-500" disabled={$loginState == undefined} onclick={gotoLinkFunctor("/match/")}>Hrát</button>
     </div>
 </main>

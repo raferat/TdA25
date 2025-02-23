@@ -1,6 +1,8 @@
 <script lang="ts">
     import "../app.css";
     import Header from "$lib/components/Header.svelte";
+    import { untrack } from "svelte";
+    import { initLoginState, refreshlogin } from "$lib/api";
 
     const { children } = $props();
 
@@ -13,6 +15,11 @@
         } else {
             document.documentElement.setAttribute("data-theme", "light")
         }
+
+        untrack(() => {
+            initLoginState();
+            refreshlogin();
+        });
     })
 
     let headerHeight = $state(0);
