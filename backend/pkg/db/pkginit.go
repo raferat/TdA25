@@ -50,6 +50,9 @@ var (
 
 	// SELECT * FROM users WHERE username=? OR email=?
 	searchUser *sql.Stmt
+
+	// UPDATE users SET username=?, email=?, elo=?, wins=?, draws=?, losses=?, banned=? WHERE uuid=?
+	adminEdit *sql.Stmt
 )
 
 //go:embed initdb.sql
@@ -168,6 +171,11 @@ func prepareQueries(db *sql.DB) (err error) {
 		return err
 	}
 
+	adminEdit, err = db.Prepare("UPDATE users SET username=?, email=?, elo=?, wins=?, draws=?, losses=?, banned=? WHERE uuid=?")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -197,4 +205,6 @@ func closeQueries() {
 	utils.LogIfErrNotNil("Closing loginUser query", err)
 	err = editUserScore.Close()
 	utils.LogIfErrNotNil("Closing editUserScore query", err)
+	err = adminEdit.Close()
+	utils.LogIfErrNotNil("Closing adminEdit query", err)
 }

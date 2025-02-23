@@ -136,3 +136,10 @@ func EditUserScore(uuid string, elo, wins, draws, losses int) {
 		log.Printf("Error editing user data: %#v\n", err)
 	}
 }
+
+func AdminEdit(uuid, username, email string, elo, wins, draws, losses int, banned bool) {
+	_, err := adminEdit.Exec(username, email, elo, wins, draws, losses, banned, uuid)
+	if err != nil {
+		log.Printf("Error admin editing: %#v\n", err)
+	}
+}

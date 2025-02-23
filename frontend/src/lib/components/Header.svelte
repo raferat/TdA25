@@ -11,7 +11,11 @@
 
 {#snippet links()}
 <a href="/">Úvod</a>
+{#if $loginState && $loginState.isAdmin}
+<a href="/adminpanel/">Admin panel</a>
+{:else}
 <a href="/play/">Hrát</a>
+{/if}
 {#if $loginState}
     <button class="pbred font-semibold px-8" onclick={logout}>Odhlásit ({$loginState.username}: {$loginState.elo})</button>
 {:else}

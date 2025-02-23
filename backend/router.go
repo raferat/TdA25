@@ -59,6 +59,11 @@ func registerApiRoutes() http.Handler {
 	mux.Handle("GET /realtime/refresh", http.HandlerFunc(api.RefreshLogin))
 	// mux.Handle("GET /realtime/freeplay", http.HandlerFunc(api.HandleFreeplayGame))
 
+	//================== Admin ===================
+
+	mux.Handle("POST /admin/edit", http.HandlerFunc(api.AdminUpdateUserData))
+	mux.Handle("GET /admin/users", http.HandlerFunc(api.AdminGetData))
+
 	return mux
 }
 
